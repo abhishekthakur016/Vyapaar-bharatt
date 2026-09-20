@@ -43,7 +43,7 @@ function AdminCompanies() {
       setLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:5000/api/suppliers");
+      const response = await fetch("/api/suppliers");
 
       const data = await response.json();
 
@@ -87,7 +87,7 @@ function AdminCompanies() {
       const token = localStorage.getItem("vyapaar_token");
 
       const response = await fetch(
-        `http://localhost:5000/api/admin/suppliers/${company.id}`,
+        `/api/admin/suppliers/${company.id}`,
         {
           method: "DELETE",
           headers: {
