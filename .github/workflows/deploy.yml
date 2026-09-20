@@ -13,9 +13,9 @@ jobs:
       - name: Deploy to Bluehost
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ vars.BLUEHOST_HOST }}
-          username: ${{ vars.BLUEHOST_USER }}
-          port: ${{ vars.BLUEHOST_PORT }}
+          host: ${{ secrets.BLUEHOST_HOST }}
+          username: ${{ secrets.BLUEHOST_USER }}
+          port: ${{ secrets.BLUEHOST_PORT }}
           key: ${{ secrets.BLUEHOST_SSH_KEY }}
 
           script: |
@@ -26,15 +26,15 @@ jobs:
             echo "Pulling latest code..."
             git pull origin main
 
-            echo "Installing frontend..."
+            echo "Installing frontend dependencies..."
             cd frontend
             npm ci
 
             echo "Building frontend..."
             npm run build
 
-            echo "Installing backend..."
+            echo "Installing backend dependencies..."
             cd ../backend
             npm ci
 
-            echo "Deployment completed!"
+            echo "Deployment completed successfully!"
