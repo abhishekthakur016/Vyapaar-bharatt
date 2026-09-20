@@ -2112,14 +2112,13 @@ app.post(
       }
 
       const imageUrl =
-        `http://localhost:${process.env.PORT || 5000}` +
-        `/uploads/products/${req.file.filename}`;
+  `/uploads/products/${req.file.filename}`;
 
-      res.status(201).json({
-        success: true,
-        message: "Product image uploaded successfully.",
-        image_url: imageUrl,
-      });
+res.status(201).json({
+  success: true,
+  message: "Product image uploaded successfully.",
+  image_url: imageUrl,
+});
     } catch (error) {
       console.error("Product image upload error:", error);
 
