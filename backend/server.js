@@ -1874,6 +1874,45 @@ app.put("/api/insights/:id", async (req, res) => {
   }
 });
 
+
+app.delete("/api/admin/suppliers/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    if (!["admin", "super_admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required",
+      })
+    }
+
+    const result = await pool.query(
+      "DELETE FROM suppliers WHERE id = $1 RETURNING id, name",
+      [id]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      })
+    }
+
+    return res.json({
+      success: true,
+      message: "Company deleted successfully",
+      company: result.rows[0],
+    })
+  } catch (error) {
+    console.error("Delete supplier error:", error)
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete company",
+    })
+  }
+})
+
 // ===============================
 // CREATE COMPANY / SUPPLIER
 // ===============================
