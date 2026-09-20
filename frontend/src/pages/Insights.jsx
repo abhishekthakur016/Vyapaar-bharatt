@@ -97,7 +97,7 @@ function Insights() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="mb-4 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-            VYAPAAR BHARAT INSIGHTS
+            VYAPAAR BHARAT INSIGHTS.....
           </div>
 
           <Link
