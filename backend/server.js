@@ -2272,8 +2272,7 @@ app.post(
         });
       }
 
-      const imageUrl = `http://localhost:${process.env.PORT || 5000}/uploads/insights/${req.file.filename}`;
-
+const imageUrl = `/uploads/insights/${req.file.filename}`;
       res.status(201).json({
         success: true,
         message: "Image uploaded successfully.",
