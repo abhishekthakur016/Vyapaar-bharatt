@@ -1,71 +1,62 @@
-import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import {
-  ArrowLeft,
-  ArrowRight,
-  BookOpen,
-  Share2,
-} from "lucide-react"
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight, BookOpen, Share2 } from "lucide-react";
 
 function InsightDetails() {
-  const { id } = useParams()
+  const { id } = useParams();
 
-  const [insight, setInsight] = useState(null)
-  const [relatedInsights, setRelatedInsights] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const [insight, setInsight] = useState(null);
+  const [relatedInsights, setRelatedInsights] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchInsight = async () => {
       try {
-        setLoading(true)
-        setError("")
+        setLoading(true);
+        setError("");
 
-        const response = await fetch(
-          `http://localhost:5000/api/insights/${id}`
-        )
+        const response = await fetch(`/api/insights/${id}`);
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(data.message || "Insight not found")
+          throw new Error(data.message || "Insight not found");
         }
 
-        setInsight(data.insight)
+        setInsight(data.insight);
 
         // Fetch all insights to find related articles.
-        const relatedResponse = await fetch(
-          "http://localhost:5000/api/insights"
-        )
+        const relatedResponse = await fetch("/api/insights");
 
-        const relatedData = await relatedResponse.json()
+        const relatedData = await relatedResponse.json();
 
         if (relatedResponse.ok && relatedData.success) {
           const related = (relatedData.insights || [])
             .filter(
               (item) =>
                 item.id !== data.insight.id &&
-                item.category_id === data.insight.category_id
+                item.category_id === data.insight.category_id,
             )
-            .slice(0, 2)
+            .slice(0, 2);
 
-          setRelatedInsights(related)
+          setRelatedInsights(related);
         }
       } catch (err) {
-        console.error("Error fetching insight:", err)
-        setError(err.message || "Unable to load insight.")
+        console.error("Error fetching insight:", err);
+        setError(err.message || "Unable to load insight.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchInsight()
-  }, [id])
+    fetchInsight();
+  }, [id]);
 
   const handleShare = async () => {
-    if (!insight) return
+    if (!insight) return;
 
-    const url = window.location.href
+    const url = window.location.href;
 
     try {
       if (navigator.share) {
@@ -73,15 +64,15 @@ function InsightDetails() {
           title: insight.title,
           text: insight.excerpt,
           url,
-        })
+        });
       } else {
-        await navigator.clipboard.writeText(url)
-        alert("Insight link copied!")
+        await navigator.clipboard.writeText(url);
+        alert("Insight link copied!");
       }
     } catch (error) {
-      console.log("Share cancelled")
+      console.log("Share cancelled");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -93,7 +84,7 @@ function InsightDetails() {
           </p>
         </div>
       </main>
-    )
+    );
   }
 
   if (error || !insight) {
@@ -117,20 +108,16 @@ function InsightDetails() {
           </Link>
         </div>
       </main>
-    )
+    );
   }
 
-  const contentLines = (insight.content || "")
-    .trim()
-    .split("\n")
+  const contentLines = (insight.content || "").trim().split("\n");
 
   return (
     <main className="bg-white">
-
       {/* HEADER */}
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-
           <Link
             to="/insights"
             className="inline-flex items-center gap-2 text-sm font-semibold text-[#0952d4]"
@@ -173,7 +160,6 @@ function InsightDetails() {
       {/* ARTICLE */}
       <section>
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-
           {insight.image_url ? (
             <div
               className="mb-10 h-64 rounded-2xl bg-cover bg-center sm:h-80"
@@ -187,10 +173,10 @@ function InsightDetails() {
 
           <article className="max-w-none">
             {contentLines.map((line, index) => {
-              const text = line.trim()
+              const text = line.trim();
 
               if (!text) {
-                return <div key={index} className="h-3" />
+                return <div key={index} className="h-3" />;
               }
 
               if (text.startsWith("### ")) {
@@ -201,17 +187,14 @@ function InsightDetails() {
                   >
                     {text.replace("### ", "")}
                   </h2>
-                )
+                );
               }
 
               return (
-                <p
-                  key={index}
-                  className="text-base leading-8 text-slate-600"
-                >
+                <p key={index} className="text-base leading-8 text-slate-600">
                   {text}
                 </p>
-              )
+              );
             })}
           </article>
         </div>
@@ -221,7 +204,6 @@ function InsightDetails() {
       {relatedInsights.length > 0 && (
         <section className="border-t border-slate-200 bg-slate-50">
           <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-
             <div className="mb-7">
               <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
                 KEEP READING
@@ -274,7 +256,6 @@ function InsightDetails() {
                 </Link>
               ))}
             </div>
-
           </div>
         </section>
       )}
@@ -282,7 +263,6 @@ function InsightDetails() {
       {/* CTA */}
       <section className="bg-white px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl rounded-xl bg-[#0b1f3a] px-6 py-10 text-center">
-
           <h2 className="text-xl font-bold text-white">
             Ready to find the right business partner?
           </h2>
@@ -298,12 +278,10 @@ function InsightDetails() {
             Post a Requirement
             <ArrowRight size={16} />
           </Link>
-
         </div>
       </section>
-
     </main>
-  )
+  );
 }
 
-export default InsightDetails
+export default InsightDetails;

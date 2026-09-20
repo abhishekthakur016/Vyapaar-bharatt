@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -8,13 +8,13 @@ import {
   Save,
   Trash2,
   Upload,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function AdminAddProduct() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [suppliers, setSuppliers] = useState([])
-  const [loadingSuppliers, setLoadingSuppliers] = useState(true)
+  const [suppliers, setSuppliers] = useState([]);
+  const [loadingSuppliers, setLoadingSuppliers] = useState(true);
 
   const [formData, setFormData] = useState({
     supplierId: "",
@@ -27,17 +27,17 @@ export default function AdminAddProduct() {
     moq: "",
     moqUnit: "Piece",
     availability: "Available",
-  })
+  });
 
-  const [productImage, setProductImage] = useState(null)
-  const [imagePreview, setImagePreview] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
+  const [productImage, setProductImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
-  const [submitting, setSubmitting] = useState(false)
-  const [uploadingImage, setUploadingImage] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // ==========================================
   // FETCH SUPPLIERS
@@ -46,101 +46,88 @@ export default function AdminAddProduct() {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        setLoadingSuppliers(true)
+        setLoadingSuppliers(true);
 
-        const response = await fetch(
-          "http://localhost:5000/api/suppliers"
-        )
+        const response = await fetch("/api/suppliers");
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(
-            data.message || "Failed to load companies"
-          )
+          throw new Error(data.message || "Failed to load companies");
         }
 
-        setSuppliers(data.suppliers || [])
+        setSuppliers(data.suppliers || []);
       } catch (error) {
-        console.error("Error fetching suppliers:", error)
+        console.error("Error fetching suppliers:", error);
 
-        setError(
-          error.message || "Unable to load companies."
-        )
+        setError(error.message || "Unable to load companies.");
       } finally {
-        setLoadingSuppliers(false)
+        setLoadingSuppliers(false);
       }
-    }
+    };
 
-    fetchSuppliers()
-  }, [])
+    fetchSuppliers();
+  }, []);
 
   // ==========================================
   // FORM CHANGE
   // ==========================================
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     setFormData((current) => ({
       ...current,
       [name]: value,
-    }))
+    }));
 
-    setError("")
-    setSuccess("")
-  }
+    setError("");
+    setSuccess("");
+  };
 
   // ==========================================
   // IMAGE SELECT
   // ==========================================
 
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
 
     if (!file) {
-      return
+      return;
     }
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-    ]
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
-      setError(
-        "Only JPG, JPEG, PNG and WEBP images are allowed."
-      )
+      setError("Only JPG, JPEG, PNG and WEBP images are allowed.");
 
-      e.target.value = ""
-      return
+      e.target.value = "";
+      return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("Image size must be 5 MB or less.")
+      setError("Image size must be 5 MB or less.");
 
-      e.target.value = ""
-      return
+      e.target.value = "";
+      return;
     }
 
-    setProductImage(file)
-    setImagePreview(URL.createObjectURL(file))
-    setImageUrl("")
-    setError("")
-    setSuccess("")
-  }
+    setProductImage(file);
+    setImagePreview(URL.createObjectURL(file));
+    setImageUrl("");
+    setError("");
+    setSuccess("");
+  };
 
   // ==========================================
   // REMOVE IMAGE
   // ==========================================
 
   const handleRemoveImage = () => {
-    setProductImage(null)
-    setImagePreview("")
-    setImageUrl("")
-  }
+    setProductImage(null);
+    setImagePreview("");
+    setImageUrl("");
+  };
 
   // ==========================================
   // UPLOAD IMAGE
@@ -148,143 +135,120 @@ export default function AdminAddProduct() {
 
   const uploadProductImage = async () => {
     if (!productImage) {
-      return ""
+      return "";
     }
 
-    const uploadData = new FormData()
+    const uploadData = new FormData();
 
-    uploadData.append("image", productImage)
+    uploadData.append("image", productImage);
 
-    const response = await fetch(
-      "http://localhost:5000/api/products/upload-image",
-      {
-        method: "POST",
-        body: uploadData,
-      }
-    )
+    const response = await fetch("/api/products/upload-image", {
+      method: "POST",
+      body: uploadData,
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(
-        data.message || "Failed to upload product image."
-      )
+      throw new Error(data.message || "Failed to upload product image.");
     }
 
-    return data.image_url || ""
-  }
+    return data.image_url || "";
+  };
 
   // ==========================================
   // SUBMIT PRODUCT
   // ==========================================
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    setError("")
-    setSuccess("")
+    setError("");
+    setSuccess("");
 
     if (!formData.supplierId) {
-      setError("Please select a company.")
-      return
+      setError("Please select a company.");
+      return;
     }
 
     if (!formData.name.trim()) {
-      setError("Product name is required.")
-      return
+      setError("Product name is required.");
+      return;
     }
 
     if (!formData.category.trim()) {
-      setError("Category is required.")
-      return
+      setError("Category is required.");
+      return;
     }
 
     try {
-      setSubmitting(true)
+      setSubmitting(true);
 
-      let uploadedImageUrl = imageUrl
+      let uploadedImageUrl = imageUrl;
 
       // Upload image first
       if (productImage) {
-        setUploadingImage(true)
+        setUploadingImage(true);
 
-        uploadedImageUrl = await uploadProductImage()
+        uploadedImageUrl = await uploadProductImage();
 
-        setImageUrl(uploadedImageUrl)
+        setImageUrl(uploadedImageUrl);
 
-        setUploadingImage(false)
+        setUploadingImage(false);
       }
 
       // Create product
-      const response = await fetch(
-        "http://localhost:5000/api/products",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            supplierId: Number(formData.supplierId),
+      const response = await fetch("/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          supplierId: Number(formData.supplierId),
 
-            name: formData.name.trim(),
+          name: formData.name.trim(),
 
-            category:
-              formData.category.trim() || null,
+          category: formData.category.trim() || null,
 
-            subcategory:
-              formData.subcategory.trim() || null,
+          subcategory: formData.subcategory.trim() || null,
 
-            description:
-              formData.description.trim() || null,
+          description: formData.description.trim() || null,
 
-            price: formData.price
-              ? Number(formData.price)
-              : null,
+          price: formData.price ? Number(formData.price) : null,
 
-            priceUnit:
-              formData.priceUnit || null,
+          priceUnit: formData.priceUnit || null,
 
-            moq: formData.moq
-              ? Number(formData.moq)
-              : null,
+          moq: formData.moq ? Number(formData.moq) : null,
 
-            moqUnit:
-              formData.moqUnit || null,
+          moqUnit: formData.moqUnit || null,
 
-            availability:
-              formData.availability || "Available",
+          availability: formData.availability || "Available",
 
-            imageUrl:
-              uploadedImageUrl || null,
-          }),
-        }
-      )
+          imageUrl: uploadedImageUrl || null,
+        }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(
-          data.message || "Failed to create product."
-        )
+        throw new Error(data.message || "Failed to create product.");
       }
 
-      setSuccess("Product created successfully.")
+      setSuccess("Product created successfully.");
 
       setTimeout(() => {
-        navigate("/admin/products")
-      }, 800)
+        navigate("/admin/products");
+      }, 800);
     } catch (error) {
-      console.error("Create product error:", error)
+      console.error("Create product error:", error);
 
-      setUploadingImage(false)
+      setUploadingImage(false);
 
-      setError(
-        error.message || "Failed to create product."
-      )
+      setError(error.message || "Failed to create product.");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -395,13 +359,9 @@ export default function AdminAddProduct() {
 
         <header className="flex h-[82px] items-center justify-between border-b border-slate-200 bg-white px-5 sm:px-6 lg:px-8">
           <div>
-            <p className="text-sm font-medium text-slate-400">
-              Admin Panel
-            </p>
+            <p className="text-sm font-medium text-slate-400">Admin Panel</p>
 
-            <h1 className="text-xl font-bold text-[#0b1f3a]">
-              Add Product
-            </h1>
+            <h1 className="text-xl font-bold text-[#0b1f3a]">Add Product</h1>
           </div>
 
           <Link
@@ -490,10 +450,7 @@ export default function AdminAddProduct() {
                         </option>
 
                         {suppliers.map((supplier) => (
-                          <option
-                            key={supplier.id}
-                            value={supplier.id}
-                          >
+                          <option key={supplier.id} value={supplier.id}>
                             {supplier.name}
                           </option>
                         ))}
@@ -747,21 +704,13 @@ export default function AdminAddProduct() {
                       onChange={handleChange}
                       className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#0952d4] focus:ring-4 focus:ring-blue-50"
                     >
-                      <option value="Available">
-                        Available
-                      </option>
+                      <option value="Available">Available</option>
 
-                      <option value="Limited Stock">
-                        Limited Stock
-                      </option>
+                      <option value="Limited Stock">Limited Stock</option>
 
-                      <option value="Made to Order">
-                        Made to Order
-                      </option>
+                      <option value="Made to Order">Made to Order</option>
 
-                      <option value="Out of Stock">
-                        Out of Stock
-                      </option>
+                      <option value="Out of Stock">Out of Stock</option>
                     </select>
                   </div>
                 </section>
@@ -805,5 +754,5 @@ export default function AdminAddProduct() {
         </main>
       </div>
     </div>
-  )
+  );
 }

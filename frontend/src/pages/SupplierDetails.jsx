@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,113 +16,108 @@ import {
   Building2,
   Send,
   Image as ImageIcon,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function SupplierDetails() {
-  const { id } = useParams()
+  const { id } = useParams();
 
-  const [supplier, setSupplier] = useState(null)
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [activeImage, setActiveImage] = useState(0)
+  const [supplier, setSupplier] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     const fetchSupplier = async () => {
       try {
-        setLoading(true)
-        setError("")
+        setLoading(true);
+        setError("");
 
-        const response = await fetch(
-          `http://localhost:5000/api/suppliers/${id}`
-        )
+        const response = await fetch(`/api/suppliers/${id}`);
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(data.message || "Supplier not found")
+          throw new Error(data.message || "Supplier not found");
         }
 
-const supplierData = {
-  ...data.supplier,
-  businessType: data.supplier.business_type,
-  serviceAreas: data.supplier.service_areas || [],
-  services: data.supplier.services || [],
-}
+        const supplierData = {
+          ...data.supplier,
+          businessType: data.supplier.business_type,
+          serviceAreas: data.supplier.service_areas || [],
+          services: data.supplier.services || [],
+        };
 
-setSupplier(supplierData)
+        setSupplier(supplierData);
         // Fetch products belonging to this supplier
-        const productsResponse = await fetch(
-          "http://localhost:5000/api/products"
-        )
+        const productsResponse = await fetch("/api/products");
 
-        const productsData = await productsResponse.json()
+        const productsData = await productsResponse.json();
 
         if (productsResponse.ok && productsData.success) {
           const supplierProducts = productsData.products.filter(
-            (product) =>
-              String(product.supplier_id) === String(id)
-          )
+            (product) => String(product.supplier_id) === String(id),
+          );
 
-          setProducts(supplierProducts)
+          setProducts(supplierProducts);
         }
       } catch (err) {
-        console.error("Error loading supplier:", err)
-        setError(err.message || "Failed to load supplier")
+        console.error("Error loading supplier:", err);
+        setError(err.message || "Failed to load supplier");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchSupplier()
-  }, [id])
+    fetchSupplier();
+  }, [id]);
 
   const galleryImages = useMemo(() => {
-    if (!supplier) return []
+    if (!supplier) return [];
 
-    const images = []
+    const images = [];
 
     if (supplier.image_url) {
-      images.push(supplier.image_url)
+      images.push(supplier.image_url);
     }
 
     if (Array.isArray(supplier.gallery_images)) {
       supplier.gallery_images.forEach((image) => {
         if (image && !images.includes(image)) {
-          images.push(image)
+          images.push(image);
         }
-      })
+      });
     }
 
-    return images
-  }, [supplier])
+    return images;
+  }, [supplier]);
 
   const nextImage = () => {
-    if (!galleryImages.length) return
+    if (!galleryImages.length) return;
 
     setActiveImage((current) =>
-      current === galleryImages.length - 1 ? 0 : current + 1
-    )
-  }
+      current === galleryImages.length - 1 ? 0 : current + 1,
+    );
+  };
 
   const previousImage = () => {
-    if (!galleryImages.length) return
+    if (!galleryImages.length) return;
 
     setActiveImage((current) =>
-      current === 0 ? galleryImages.length - 1 : current - 1
-    )
-  }
+      current === 0 ? galleryImages.length - 1 : current - 1,
+    );
+  };
 
   const getSupplierInitials = () => {
-    if (!supplier?.name) return "VB"
+    if (!supplier?.name) return "VB";
 
     return supplier.name
       .split(" ")
       .slice(0, 2)
       .map((word) => word.charAt(0))
       .join("")
-      .toUpperCase()
-  }
+      .toUpperCase();
+  };
 
   if (loading) {
     return (
@@ -153,17 +148,14 @@ setSupplier(supplierData)
           </div>
         </section>
       </main>
-    )
+    );
   }
 
   if (error || !supplier) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-20">
         <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <Building2
-            className="mx-auto text-slate-400"
-            size={48}
-          />
+          <Building2 className="mx-auto text-slate-400" size={48} />
 
           <h1 className="mt-5 text-2xl font-bold text-[#0b1f3a]">
             Supplier not found
@@ -182,7 +174,7 @@ setSupplier(supplierData)
           </Link>
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -251,7 +243,6 @@ setSupplier(supplierData)
         <div className="grid gap-6 lg:grid-cols-[1fr_330px]">
           {/* ================= LEFT ================= */}
           <div className="space-y-6">
-
             {/* ================= MODERN GALLERY ================= */}
             <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
               {galleryImages.length > 0 ? (
@@ -365,14 +356,9 @@ setSupplier(supplierData)
 
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <Building2
-                    size={20}
-                    className="text-blue-600"
-                  />
+                  <Building2 size={20} className="text-blue-600" />
 
-                  <p className="mt-3 text-xs text-slate-400">
-                    Business Type
-                  </p>
+                  <p className="mt-3 text-xs text-slate-400">Business Type</p>
 
                   <p className="mt-1 font-semibold text-[#0b1f3a]">
                     {supplier.business_type || "Business"}
@@ -380,14 +366,9 @@ setSupplier(supplierData)
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <Package
-                    size={20}
-                    className="text-blue-600"
-                  />
+                  <Package size={20} className="text-blue-600" />
 
-                  <p className="mt-3 text-xs text-slate-400">
-                    Products
-                  </p>
+                  <p className="mt-3 text-xs text-slate-400">Products</p>
 
                   <p className="mt-1 font-semibold text-[#0b1f3a]">
                     {products.length}+
@@ -395,14 +376,9 @@ setSupplier(supplierData)
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
-                  <MapPin
-                    size={20}
-                    className="text-blue-600"
-                  />
+                  <MapPin size={20} className="text-blue-600" />
 
-                  <p className="mt-3 text-xs text-slate-400">
-                    Location
-                  </p>
+                  <p className="mt-3 text-xs text-slate-400">Location</p>
 
                   <p className="mt-1 font-semibold text-[#0b1f3a]">
                     {supplier.location || "India"}
@@ -436,8 +412,7 @@ setSupplier(supplierData)
                         </div>
 
                         <span className="rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-600">
-                          {product.price_unit ||
-                            "Price on Request"}
+                          {product.price_unit || "Price on Request"}
                         </span>
                       </div>
 
@@ -455,8 +430,7 @@ setSupplier(supplierData)
                         <p className="mt-1 text-xs text-slate-500">
                           Minimum Order:{" "}
                           <span className="font-semibold">
-                            {product.moq}{" "}
-                            {product.moq_unit || ""}
+                            {product.moq} {product.moq_unit || ""}
                           </span>
                         </p>
                       )}
@@ -473,10 +447,9 @@ setSupplier(supplierData)
                 </div>
 
                 <p className="mt-5 text-xs leading-5 text-slate-400">
-                  Prices shown as indicative or supplier-provided
-                  listing information. Final pricing may vary based on
-                  quantity, specifications, location, freight, taxes and
-                  delivery terms.
+                  Prices shown as indicative or supplier-provided listing
+                  information. Final pricing may vary based on quantity,
+                  specifications, location, freight, taxes and delivery terms.
                 </p>
               </section>
             )}
@@ -484,9 +457,7 @@ setSupplier(supplierData)
             {/* ================= SERVICES ================= */}
             {supplier.services?.length > 0 && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
-                <h2 className="text-xl font-bold text-[#0b1f3a]">
-                  Services
-                </h2>
+                <h2 className="text-xl font-bold text-[#0b1f3a]">Services</h2>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {supplier.services.map((service, index) => (
@@ -511,10 +482,7 @@ setSupplier(supplierData)
             {supplier.serviceAreas?.length > 0 && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="flex items-center gap-3">
-                  <Truck
-                    className="text-blue-600"
-                    size={21}
-                  />
+                  <Truck className="text-blue-600" size={21} />
 
                   <h2 className="text-xl font-bold text-[#0b1f3a]">
                     Service Areas
@@ -539,9 +507,7 @@ setSupplier(supplierData)
           <aside className="space-y-5">
             {/* Contact */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 lg:sticky lg:top-24">
-              <h2 className="font-bold text-[#0b1f3a]">
-                Contact Supplier
-              </h2>
+              <h2 className="font-bold text-[#0b1f3a]">Contact Supplier</h2>
 
               <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600">
                 <Send size={17} />
@@ -550,30 +516,20 @@ setSupplier(supplierData)
 
               <div className="mt-5 space-y-3">
                 <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-                  <MapPin
-                    size={18}
-                    className="shrink-0 text-blue-600"
-                  />
+                  <MapPin size={18} className="shrink-0 text-blue-600" />
 
                   <div>
-                    <p className="text-xs text-slate-400">
-                      Location
-                    </p>
+                    <p className="text-xs text-slate-400">Location</p>
 
                     <p className="text-sm font-semibold text-slate-700">
-                      {supplier.address ||
-                        supplier.location ||
-                        "India"}
+                      {supplier.address || supplier.location || "India"}
                     </p>
                   </div>
                 </div>
 
                 {supplier.phone && (
                   <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-                    <Phone
-                      size={18}
-                      className="text-blue-600"
-                    />
+                    <Phone size={18} className="text-blue-600" />
 
                     <p className="text-sm font-semibold text-slate-700">
                       {supplier.phone}
@@ -583,10 +539,7 @@ setSupplier(supplierData)
 
                 {supplier.email && (
                   <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-                    <Mail
-                      size={18}
-                      className="text-blue-600"
-                    />
+                    <Mail size={18} className="text-blue-600" />
 
                     <p className="break-all text-sm font-semibold text-slate-700">
                       {supplier.email}
@@ -599,28 +552,21 @@ setSupplier(supplierData)
             {/* Trust */}
             <div className="rounded-2xl bg-blue-50 p-5">
               <div className="flex items-center gap-3">
-                <ShieldCheck
-                  className="text-blue-600"
-                  size={25}
-                />
+                <ShieldCheck className="text-blue-600" size={25} />
 
-                <h3 className="font-bold text-[#0b1f3a]">
-                  Buyer Protection
-                </h3>
+                <h3 className="font-bold text-[#0b1f3a]">Buyer Protection</h3>
               </div>
 
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                Compare supplier information, request quotations and
-                discuss your requirements before placing an order.
+                Compare supplier information, request quotations and discuss
+                your requirements before placing an order.
               </p>
             </div>
 
             {/* Rating */}
             {supplier.rating && (
               <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                <h3 className="font-bold text-[#0b1f3a]">
-                  Supplier Rating
-                </h3>
+                <h3 className="font-bold text-[#0b1f3a]">Supplier Rating</h3>
 
                 <div className="mt-4 flex items-center gap-3">
                   <div className="text-3xl font-black text-[#0b1f3a]">
@@ -649,5 +595,5 @@ setSupplier(supplierData)
         </div>
       </section>
     </main>
-  )
+  );
 }

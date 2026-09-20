@@ -47,9 +47,7 @@ export default function ProductDetails() {
         setLoading(true);
         setError("");
 
-        const response = await fetch(
-          `http://localhost:5000/api/products/${id}`,
-        );
+        const response = await fetch(`/api/products/${id}`);
 
         if (!response.ok) {
           throw new Error("Product not found");
@@ -106,7 +104,7 @@ export default function ProductDetails() {
       setQuoteError("");
       setQuoteSuccess("");
 
-      const response = await fetch("http://localhost:5000/api/requirements", {
+      const response = await fetch("/api/requirements", {
         method: "POST",
 
         headers: {

@@ -14,7 +14,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-const API = "http://localhost:5000";
+const API = "";
 
 export default function MyQuotes() {
   const [quotes, setQuotes] = useState([]);
@@ -24,9 +24,7 @@ export default function MyQuotes() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const user = JSON.parse(
-    localStorage.getItem("vyapaar_user") || "null"
-  );
+  const user = JSON.parse(localStorage.getItem("vyapaar_user") || "null");
 
   const token = localStorage.getItem("vyapaar_token");
 
@@ -54,9 +52,7 @@ export default function MyQuotes() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(
-          data.message || "Failed to fetch your quotes."
-        );
+        throw new Error(data.message || "Failed to fetch your quotes.");
       }
 
       setQuotes(data.quotes || []);
@@ -79,19 +75,12 @@ export default function MyQuotes() {
     return quotes.filter((quote) => {
       const matchesSearch =
         !query ||
-        quote.requirement_title
-          ?.toLowerCase()
-          .includes(query) ||
-        quote.requirement_category
-          ?.toLowerCase()
-          .includes(query) ||
-        quote.message
-          ?.toLowerCase()
-          .includes(query);
+        quote.requirement_title?.toLowerCase().includes(query) ||
+        quote.requirement_category?.toLowerCase().includes(query) ||
+        quote.message?.toLowerCase().includes(query);
 
       const matchesStatus =
-        statusFilter === "all" ||
-        quote.status?.toLowerCase() === statusFilter;
+        statusFilter === "all" || quote.status?.toLowerCase() === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -100,18 +89,10 @@ export default function MyQuotes() {
   const stats = useMemo(() => {
     return {
       total: quotes.length,
-      pending: quotes.filter(
-        (q) => q.status === "pending"
-      ).length,
-      negotiating: quotes.filter(
-        (q) => q.status === "negotiating"
-      ).length,
-      accepted: quotes.filter(
-        (q) => q.status === "accepted"
-      ).length,
-      rejected: quotes.filter(
-        (q) => q.status === "rejected"
-      ).length,
+      pending: quotes.filter((q) => q.status === "pending").length,
+      negotiating: quotes.filter((q) => q.status === "negotiating").length,
+      accepted: quotes.filter((q) => q.status === "accepted").length,
+      rejected: quotes.filter((q) => q.status === "rejected").length,
     };
   }, [quotes]);
 
@@ -177,9 +158,7 @@ export default function MyQuotes() {
             <FileText className="h-8 w-8 text-blue-600" />
           </div>
 
-          <h1 className="text-2xl font-bold text-[#0b1f3a]">
-            Login Required
-          </h1>
+          <h1 className="text-2xl font-bold text-[#0b1f3a]">Login Required</h1>
 
           <p className="mt-3 text-slate-500">
             Please login as a supplier to view your submitted quotes.
@@ -240,9 +219,7 @@ export default function MyQuotes() {
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-[#0952d4] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw
-                className={`h-4 w-4 ${
-                  refreshing ? "animate-spin" : ""
-                }`}
+                className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
               />
               Refresh
             </button>
@@ -253,17 +230,9 @@ export default function MyQuotes() {
       <main className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          <StatCard
-            label="Total Quotes"
-            value={stats.total}
-            icon={FileText}
-          />
+          <StatCard label="Total Quotes" value={stats.total} icon={FileText} />
 
-          <StatCard
-            label="Pending"
-            value={stats.pending}
-            icon={Clock3}
-          />
+          <StatCard label="Pending" value={stats.pending} icon={Clock3} />
 
           <StatCard
             label="Negotiating"
@@ -277,11 +246,7 @@ export default function MyQuotes() {
             icon={CheckCircle2}
           />
 
-          <StatCard
-            label="Rejected"
-            value={stats.rejected}
-            icon={XCircle}
-          />
+          <StatCard label="Rejected" value={stats.rejected} icon={XCircle} />
         </div>
 
         {/* Filters */}
@@ -358,9 +323,7 @@ export default function MyQuotes() {
           /* Quotes */
           <div className="mt-8 space-y-5">
             {filteredQuotes.map((quote) => {
-              const status = getStatusStyle(
-                quote.status
-              );
+              const status = getStatusStyle(quote.status);
 
               const StatusIcon = status.icon;
 
@@ -387,13 +350,11 @@ export default function MyQuotes() {
                         </div>
 
                         <h2 className="mt-3 text-xl font-bold text-[#0b1f3a]">
-                          {quote.requirement_title ||
-                            "Buyer Requirement"}
+                          {quote.requirement_title || "Buyer Requirement"}
                         </h2>
 
                         <p className="mt-1 text-sm text-slate-500">
-                          {quote.requirement_category ||
-                            "General"}
+                          {quote.requirement_category || "General"}
                         </p>
                       </div>
 
@@ -418,9 +379,7 @@ export default function MyQuotes() {
                     <div className="mt-6 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-4">
                       <InfoItem
                         label="Quantity"
-                        value={`${quote.quantity || "—"} ${
-                          quote.unit || ""
-                        }`}
+                        value={`${quote.quantity || "—"} ${quote.unit || ""}`}
                       />
 
                       <InfoItem
@@ -431,8 +390,7 @@ export default function MyQuotes() {
                       <InfoItem
                         label="Delivery Location"
                         value={
-                          quote.requirement_delivery_location ||
-                          "Not specified"
+                          quote.requirement_delivery_location || "Not specified"
                         }
                         icon={MapPin}
                       />
@@ -460,9 +418,7 @@ export default function MyQuotes() {
                     <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                       <p className="text-xs text-slate-400">
                         Last updated:{" "}
-                        {formatDate(
-                          quote.updated_at || quote.created_at
-                        )}
+                        {formatDate(quote.updated_at || quote.created_at)}
                       </p>
 
                       <Link
@@ -488,13 +444,9 @@ function StatCard({ label, value, icon: Icon }) {
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-medium text-slate-400">
-            {label}
-          </p>
+          <p className="text-xs font-medium text-slate-400">{label}</p>
 
-          <p className="mt-1 text-2xl font-bold text-[#0b1f3a]">
-            {value}
-          </p>
+          <p className="mt-1 text-2xl font-bold text-[#0b1f3a]">{value}</p>
         </div>
 
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
@@ -513,9 +465,7 @@ function InfoItem({ label, value, icon: Icon }) {
       </p>
 
       <div className="mt-1 flex items-start gap-1.5 text-sm font-semibold text-slate-700">
-        {Icon && (
-          <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-        )}
+        {Icon && <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />}
 
         <span>{value}</span>
       </div>

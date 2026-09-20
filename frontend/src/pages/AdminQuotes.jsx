@@ -115,7 +115,7 @@
 //       setError("")
 
 //       const response = await fetch(
-//         "http://localhost:5000/api/admin/quotes"
+//         "/api/admin/quotes"
 //       )
 
 //       const data = await response.json()
@@ -248,7 +248,7 @@
 //       setError("")
 
 //       const response = await fetch(
-//         `http://localhost:5000/api/quotes/${quoteId}/status`,
+//         `/api/quotes/${quoteId}/status`,
 //         {
 //           method: "PATCH",
 //           headers: {

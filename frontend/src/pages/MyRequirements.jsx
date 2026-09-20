@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "";
 
 function formatDate(date) {
   if (!date) return "Not specified";
@@ -35,7 +35,7 @@ function formatDate(date) {
 function formatBudget(min, max) {
   if (min != null && max != null) {
     return `₹${Number(min).toLocaleString("en-IN")} - ₹${Number(
-      max
+      max,
     ).toLocaleString("en-IN")}`;
   }
 
@@ -102,21 +102,16 @@ export default function MyRequirements() {
         throw new Error("Please login as a buyer to view your requirements.");
       }
 
-      const response = await fetch(
-        `${API_BASE}/api/my-requirements`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/api/my-requirements`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to fetch your requirements."
-        );
+        throw new Error(data.message || "Failed to fetch your requirements.");
       }
 
       setRequirements(data.requirements || []);
@@ -135,11 +130,7 @@ export default function MyRequirements() {
 
   const statuses = useMemo(() => {
     const uniqueStatuses = [
-      ...new Set(
-        requirements
-          .map((item) => item.status)
-          .filter(Boolean)
-      ),
+      ...new Set(requirements.map((item) => item.status).filter(Boolean)),
     ];
 
     return ["All", ...uniqueStatuses];
@@ -158,8 +149,7 @@ export default function MyRequirements() {
 
       const matchesStatus =
         statusFilter === "All" ||
-        requirement.status?.toLowerCase() ===
-          statusFilter.toLowerCase();
+        requirement.status?.toLowerCase() === statusFilter.toLowerCase();
 
       return matchesSearch && matchesStatus;
     });
@@ -172,17 +162,16 @@ export default function MyRequirements() {
       (item) =>
         item.status === "open" ||
         item.status === "quoted" ||
-        item.status === "negotiating"
+        item.status === "negotiating",
     ).length;
 
     const accepted = requirements.filter(
-      (item) => item.status === "accepted"
+      (item) => item.status === "accepted",
     ).length;
 
     const quotes = requirements.reduce(
-      (totalQuotes, item) =>
-        totalQuotes + Number(item.quote_count || 0),
-      0
+      (totalQuotes, item) => totalQuotes + Number(item.quote_count || 0),
+      0,
     );
 
     return {
@@ -262,9 +251,7 @@ export default function MyRequirements() {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-500">
-              Accepted
-            </p>
+            <p className="text-sm font-medium text-slate-500">Accepted</p>
             <p className="mt-2 text-3xl font-bold text-emerald-600">
               {stats.accepted}
             </p>
@@ -298,9 +285,7 @@ export default function MyRequirements() {
             >
               {statuses.map((status) => (
                 <option key={status} value={status}>
-                  {status === "All"
-                    ? "All Statuses"
-                    : getStatusLabel(status)}
+                  {status === "All" ? "All Statuses" : getStatusLabel(status)}
                 </option>
               ))}
             </select>
@@ -349,9 +334,7 @@ export default function MyRequirements() {
           </div>
         ) : error ? (
           <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-            <p className="font-semibold text-red-700">
-              {error}
-            </p>
+            <p className="font-semibold text-red-700">{error}</p>
 
             <button
               type="button"
@@ -420,7 +403,7 @@ export default function MyRequirements() {
 
                         <span
                           className={`rounded-full border px-3 py-1 text-xs font-semibold ${getStatusClasses(
-                            requirement.status
+                            requirement.status,
                           )}`}
                         >
                           {getStatusLabel(requirement.status)}
@@ -445,14 +428,12 @@ export default function MyRequirements() {
                           </div>
 
                           <div>
-                            <p className="text-xs text-slate-400">
-                              Quantity
-                            </p>
+                            <p className="text-xs text-slate-400">Quantity</p>
 
                             <p className="mt-0.5 text-sm font-semibold text-slate-700">
-                              {Number(
-                                requirement.quantity || 0
-                              ).toLocaleString("en-IN")}{" "}
+                              {Number(requirement.quantity || 0).toLocaleString(
+                                "en-IN",
+                              )}{" "}
                               {requirement.unit}
                             </p>
                           </div>
@@ -464,14 +445,12 @@ export default function MyRequirements() {
                           </div>
 
                           <div>
-                            <p className="text-xs text-slate-400">
-                              Budget
-                            </p>
+                            <p className="text-xs text-slate-400">Budget</p>
 
                             <p className="mt-0.5 text-sm font-semibold text-slate-700">
                               {formatBudget(
                                 requirement.min_budget,
-                                requirement.max_budget
+                                requirement.max_budget,
                               )}
                             </p>
                           </div>
@@ -483,13 +462,10 @@ export default function MyRequirements() {
                           </div>
 
                           <div>
-                            <p className="text-xs text-slate-400">
-                              Delivery
-                            </p>
+                            <p className="text-xs text-slate-400">Delivery</p>
 
                             <p className="mt-0.5 text-sm font-semibold text-slate-700">
-                              {requirement.delivery_location ||
-                                "Not specified"}
+                              {requirement.delivery_location || "Not specified"}
                             </p>
                           </div>
                         </div>
@@ -505,9 +481,7 @@ export default function MyRequirements() {
                             </p>
 
                             <p className="mt-0.5 text-sm font-semibold text-slate-700">
-                              {formatDate(
-                                requirement.required_by
-                              )}
+                              {formatDate(requirement.required_by)}
                             </p>
                           </div>
                         </div>
@@ -522,15 +496,11 @@ export default function MyRequirements() {
 
                         <div className="mt-2 flex items-end gap-2">
                           <span className="text-3xl font-bold text-[#0952d4]">
-                            {Number(
-                              requirement.quote_count || 0
-                            )}
+                            {Number(requirement.quote_count || 0)}
                           </span>
 
                           <span className="pb-1 text-sm text-slate-500">
-                            {Number(
-                              requirement.quote_count || 0
-                            ) === 1
+                            {Number(requirement.quote_count || 0) === 1
                               ? "quote received"
                               : "quotes received"}
                           </span>
@@ -538,8 +508,8 @@ export default function MyRequirements() {
 
                         {Number(requirement.quote_count || 0) > 0 && (
                           <p className="mt-2 text-xs leading-5 text-slate-500">
-                            Open this requirement to review supplier
-                            quotes and take action.
+                            Open this requirement to review supplier quotes and
+                            take action.
                           </p>
                         )}
                       </div>
@@ -548,8 +518,7 @@ export default function MyRequirements() {
 
                   <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xs text-slate-400">
-                      Posted{" "}
-                      {formatDate(requirement.created_at)}
+                      Posted {formatDate(requirement.created_at)}
                     </p>
 
                     <Link

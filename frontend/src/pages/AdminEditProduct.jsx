@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Save,
@@ -23,26 +23,24 @@ import {
   RefreshCw,
   Menu,
   X,
-} from "lucide-react"
+} from "lucide-react";
 
-const API_URL = "http://localhost:5000"
+const API_URL = "";
 
 function AdminEditProduct() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const [suppliers, setSuppliers] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const [suppliers, setSuppliers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [mobileMenuOpen, setMobileMenuOpen] =
-    useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [imageFile, setImageFile] = useState(null)
-  const [imagePreview, setImagePreview] =
-    useState("")
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
 
   const [formData, setFormData] = useState({
     supplierId: "",
@@ -56,155 +54,115 @@ function AdminEditProduct() {
     moqUnit: "",
     availability: "Available",
     imageUrl: "",
-  })
+  });
 
   // ===============================
   // FETCH PRODUCT + SUPPLIERS
   // ===============================
 
   useEffect(() => {
-    fetchData()
-  }, [id])
+    fetchData();
+  }, [id]);
 
   const fetchData = async () => {
     try {
-      setLoading(true)
-      setError("")
+      setLoading(true);
+      setError("");
 
-      const [productResponse, suppliersResponse] =
-        await Promise.all([
-          fetch(`${API_URL}/api/products/${id}`),
-          fetch(`${API_URL}/api/suppliers`),
-        ])
+      const [productResponse, suppliersResponse] = await Promise.all([
+        fetch(`${API_URL}/api/products/${id}`),
+        fetch(`${API_URL}/api/suppliers`),
+      ]);
 
-      const productData =
-        await productResponse.json()
+      const productData = await productResponse.json();
 
-      const suppliersData =
-        await suppliersResponse.json()
+      const suppliersData = await suppliersResponse.json();
 
-      if (
-        !productResponse.ok ||
-        !productData.success ||
-        !productData.product
-      ) {
-        throw new Error(
-          productData.message ||
-            "Product not found."
-        )
+      if (!productResponse.ok || !productData.success || !productData.product) {
+        throw new Error(productData.message || "Product not found.");
       }
 
-      setSuppliers(
-        suppliersData.suppliers || []
-      )
+      setSuppliers(suppliersData.suppliers || []);
 
-      const product = productData.product
+      const product = productData.product;
 
       setFormData({
-        supplierId:
-          product.supplier_id || "",
+        supplierId: product.supplier_id || "",
         name: product.name || "",
-        category:
-          product.category || "",
-        subcategory:
-          product.subcategory || "",
-        description:
-          product.description || "",
-        price:
-          product.price ?? "",
-        priceUnit:
-          product.price_unit || "",
-        moq:
-          product.moq ?? "",
-        moqUnit:
-          product.moq_unit || "",
-        availability:
-          product.availability || "Available",
-        imageUrl:
-          product.image_url || "",
-      })
+        category: product.category || "",
+        subcategory: product.subcategory || "",
+        description: product.description || "",
+        price: product.price ?? "",
+        priceUnit: product.price_unit || "",
+        moq: product.moq ?? "",
+        moqUnit: product.moq_unit || "",
+        availability: product.availability || "Available",
+        imageUrl: product.image_url || "",
+      });
 
-      setImagePreview(
-        product.image_url || ""
-      )
+      setImagePreview(product.image_url || "");
     } catch (err) {
-      console.error(
-        "Error loading product:",
-        err
-      )
+      console.error("Error loading product:", err);
 
-      setError(
-        err.message ||
-          "Failed to load product."
-      )
+      setError(err.message || "Failed to load product.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // ===============================
   // INPUT CHANGE
   // ===============================
 
   const handleChange = (event) => {
-    const { name, value } = event.target
+    const { name, value } = event.target;
 
     setFormData((current) => ({
       ...current,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   // ===============================
   // IMAGE CHANGE
   // ===============================
 
   const handleImageChange = (event) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
 
-    if (!file) return
+    if (!file) return;
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-    ]
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
-      alert(
-        "Only JPG, JPEG, PNG and WEBP images are allowed."
-      )
-      return
+      alert("Only JPG, JPEG, PNG and WEBP images are allowed.");
+      return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(
-        "Image size must be less than 5MB."
-      )
-      return
+      alert("Image size must be less than 5MB.");
+      return;
     }
 
-    setImageFile(file)
+    setImageFile(file);
 
-    const previewUrl =
-      URL.createObjectURL(file)
+    const previewUrl = URL.createObjectURL(file);
 
-    setImagePreview(previewUrl)
-  }
+    setImagePreview(previewUrl);
+  };
 
   // ===============================
   // REMOVE IMAGE
   // ===============================
 
   const handleRemoveImage = () => {
-    setImageFile(null)
-    setImagePreview("")
+    setImageFile(null);
+    setImagePreview("");
     setFormData((current) => ({
       ...current,
       imageUrl: "",
-    }))
-  }
+    }));
+  };
 
   // ===============================
   // UPLOAD IMAGE
@@ -212,158 +170,114 @@ function AdminEditProduct() {
 
   const uploadImage = async () => {
     if (!imageFile) {
-      return formData.imageUrl || null
+      return formData.imageUrl || null;
     }
 
-    const uploadData = new FormData()
+    const uploadData = new FormData();
 
-    uploadData.append(
-      "image",
-      imageFile
-    )
+    uploadData.append("image", imageFile);
 
-    const response = await fetch(
-      `${API_URL}/api/products/upload-image`,
-      {
-        method: "POST",
-        body: uploadData,
-      }
-    )
+    const response = await fetch(`${API_URL}/api/products/upload-image`, {
+      method: "POST",
+      body: uploadData,
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(
-        data.message ||
-          "Failed to upload product image."
-      )
+      throw new Error(data.message || "Failed to upload product image.");
     }
 
-    return data.image_url
-  }
+    return data.image_url;
+  };
 
   // ===============================
   // SUBMIT
   // ===============================
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    setError("")
-    setSuccess("")
+    setError("");
+    setSuccess("");
 
     if (!formData.supplierId) {
-      setError("Please select a company.")
-      return
+      setError("Please select a company.");
+      return;
     }
 
     if (!formData.name.trim()) {
-      setError("Product name is required.")
-      return
+      setError("Product name is required.");
+      return;
     }
 
     try {
-      setSubmitting(true)
+      setSubmitting(true);
 
       // Upload new image if selected
-      const imageUrl =
-        await uploadImage()
+      const imageUrl = await uploadImage();
 
-      const response = await fetch(
-        `${API_URL}/api/products/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            supplierId:
-              formData.supplierId,
+      const response = await fetch(`${API_URL}/api/products/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          supplierId: formData.supplierId,
 
-            name:
-              formData.name.trim(),
+          name: formData.name.trim(),
 
-            category:
-              formData.category,
+          category: formData.category,
 
-            subcategory:
-              formData.subcategory,
+          subcategory: formData.subcategory,
 
-            description:
-              formData.description,
+          description: formData.description,
 
-            price:
-              formData.price,
+          price: formData.price,
 
-            priceUnit:
-              formData.priceUnit,
+          priceUnit: formData.priceUnit,
 
-            moq:
-              formData.moq,
+          moq: formData.moq,
 
-            moqUnit:
-              formData.moqUnit,
+          moqUnit: formData.moqUnit,
 
-            availability:
-              formData.availability,
+          availability: formData.availability,
 
-            imageUrl:
-              imageUrl,
-          }),
-        }
-      )
+          imageUrl: imageUrl,
+        }),
+      });
 
-      const data =
-        await response.json()
+      const data = await response.json();
 
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-        throw new Error(
-          data.message ||
-            "Failed to update product."
-        )
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to update product.");
       }
 
-      setSuccess(
-        "Product updated successfully."
-      )
+      setSuccess("Product updated successfully.");
 
       setTimeout(() => {
-        navigate("/admin/products")
-      }, 800)
+        navigate("/admin/products");
+      }, 800);
     } catch (err) {
-      console.error(
-        "Update product error:",
-        err
-      )
+      console.error("Update product error:", err);
 
-      setError(
-        err.message ||
-          "Unable to update product."
-      )
+      setError(err.message || "Unable to update product.");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   // ===============================
   // LOGOUT
   // ===============================
 
   const handleLogout = () => {
-    localStorage.removeItem(
-      "vyapaar_token"
-    )
+    localStorage.removeItem("vyapaar_token");
 
-    localStorage.removeItem(
-      "vyapaar_user"
-    )
+    localStorage.removeItem("vyapaar_user");
 
-    navigate("/login")
-  }
+    navigate("/login");
+  };
 
   // ===============================
   // SIDEBAR MENU
@@ -420,7 +334,7 @@ function AdminEditProduct() {
       icon: Settings,
       path: "#",
     },
-  ]
+  ];
 
   // ===============================
   // SIDEBAR
@@ -441,11 +355,7 @@ function AdminEditProduct() {
         transition-transform
         duration-300
         lg:translate-x-0
-        ${
-          mobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
-        }
+        ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
       `}
     >
       {/* Logo */}
@@ -459,9 +369,7 @@ function AdminEditProduct() {
         </Link>
 
         <button
-          onClick={() =>
-            setMobileMenuOpen(false)
-          }
+          onClick={() => setMobileMenuOpen(false)}
           className="rounded-lg p-2 hover:bg-white/10 lg:hidden"
         >
           <X size={20} />
@@ -477,11 +385,9 @@ function AdminEditProduct() {
 
         <nav className="space-y-1">
           {menuItems.map((item) => {
-            const Icon = item.icon
+            const Icon = item.icon;
 
-            const active =
-              item.path ===
-              "/admin/products"
+            const active = item.path === "/admin/products";
 
             if (item.path === "#") {
               return (
@@ -493,16 +399,14 @@ function AdminEditProduct() {
                   <Icon size={18} />
                   {item.label}
                 </button>
-              )
+              );
             }
 
             return (
               <Link
                 key={item.label}
                 to={item.path}
-                onClick={() =>
-                  setMobileMenuOpen(false)
-                }
+                onClick={() => setMobileMenuOpen(false)}
                 className={`
                   flex
                   items-center
@@ -523,7 +427,7 @@ function AdminEditProduct() {
                 <Icon size={18} />
                 {item.label}
               </Link>
-            )
+            );
           })}
         </nav>
       </div>
@@ -533,14 +437,9 @@ function AdminEditProduct() {
       <div className="px-4 pb-3">
         <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck
-              size={18}
-              className="text-emerald-400"
-            />
+            <ShieldCheck size={18} className="text-emerald-400" />
 
-            <span className="text-sm font-semibold">
-              System Secure
-            </span>
+            <span className="text-sm font-semibold">System Secure</span>
           </div>
 
           <p className="mt-1 text-xs text-slate-400">
@@ -561,7 +460,7 @@ function AdminEditProduct() {
         </button>
       </div>
     </aside>
-  )
+  );
 
   // ===============================
   // LOADING
@@ -575,17 +474,13 @@ function AdminEditProduct() {
         <div className="lg:pl-[270px]">
           <div className="flex min-h-screen items-center justify-center">
             <div className="flex items-center gap-3 text-sm text-slate-500">
-              <RefreshCw
-                size={20}
-                className="animate-spin"
-              />
-
+              <RefreshCw size={20} className="animate-spin" />
               Loading product...
             </div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -596,9 +491,7 @@ function AdminEditProduct() {
 
       {mobileMenuOpen && (
         <div
-          onClick={() =>
-            setMobileMenuOpen(false)
-          }
+          onClick={() => setMobileMenuOpen(false)}
           className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden"
         />
       )}
@@ -611,9 +504,7 @@ function AdminEditProduct() {
         <header className="sticky top-0 z-30 flex h-[82px] items-center justify-between border-b border-slate-200 bg-white px-5 shadow-sm sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <button
-              onClick={() =>
-                setMobileMenuOpen(true)
-              }
+              onClick={() => setMobileMenuOpen(true)}
               className="rounded-xl border border-slate-200 p-2 text-slate-700 lg:hidden"
             >
               <Menu size={20} />
@@ -624,9 +515,7 @@ function AdminEditProduct() {
                 Admin Panel
               </p>
 
-              <h2 className="text-lg font-bold text-[#0b1f3a]">
-                Edit Product
-              </h2>
+              <h2 className="text-lg font-bold text-[#0b1f3a]">Edit Product</h2>
             </div>
           </div>
 
@@ -644,9 +533,7 @@ function AdminEditProduct() {
                 Super Admin
               </p>
 
-              <p className="text-xs text-slate-500">
-                Administrator
-              </p>
+              <p className="text-xs text-slate-500">Administrator</p>
             </div>
 
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
@@ -677,8 +564,7 @@ function AdminEditProduct() {
               </h1>
 
               <p className="mt-1 text-sm text-slate-500">
-                Update product information and
-                listing details.
+                Update product information and listing details.
               </p>
             </div>
           </div>
@@ -711,10 +597,7 @@ function AdminEditProduct() {
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="mb-6">
                   <div className="flex items-center gap-2">
-                    <Package
-                      size={19}
-                      className="text-blue-600"
-                    />
+                    <Package size={19} className="text-blue-600" />
 
                     <h2 className="font-bold text-slate-900">
                       Product Information
@@ -722,8 +605,7 @@ function AdminEditProduct() {
                   </div>
 
                   <p className="mt-1 text-xs text-slate-500">
-                    Basic information about the
-                    product.
+                    Basic information about the product.
                   </p>
                 </div>
 
@@ -733,41 +615,23 @@ function AdminEditProduct() {
                   <div className="md:col-span-2">
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
                       Company
-                      <span className="text-red-500">
-                        {" "}
-                        *
-                      </span>
+                      <span className="text-red-500"> *</span>
                     </label>
 
                     <select
                       name="supplierId"
-                      value={
-                        formData.supplierId
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.supplierId}
+                      onChange={handleChange}
                       required
                       className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     >
-                      <option value="">
-                        Select company
-                      </option>
+                      <option value="">Select company</option>
 
-                      {suppliers.map(
-                        (supplier) => (
-                          <option
-                            key={
-                              supplier.id
-                            }
-                            value={
-                              supplier.id
-                            }
-                          >
-                            {supplier.name}
-                          </option>
-                        )
-                      )}
+                      {suppliers.map((supplier) => (
+                        <option key={supplier.id} value={supplier.id}>
+                          {supplier.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -776,19 +640,14 @@ function AdminEditProduct() {
                   <div className="md:col-span-2">
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
                       Product Name
-                      <span className="text-red-500">
-                        {" "}
-                        *
-                      </span>
+                      <span className="text-red-500"> *</span>
                     </label>
 
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
-                      onChange={
-                        handleChange
-                      }
+                      onChange={handleChange}
                       required
                       placeholder="Enter product name"
                       className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
@@ -805,12 +664,8 @@ function AdminEditProduct() {
                     <input
                       type="text"
                       name="category"
-                      value={
-                        formData.category
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.category}
+                      onChange={handleChange}
                       placeholder="e.g. Industrial Supplies"
                       className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     />
@@ -826,12 +681,8 @@ function AdminEditProduct() {
                     <input
                       type="text"
                       name="subcategory"
-                      value={
-                        formData.subcategory
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.subcategory}
+                      onChange={handleChange}
                       placeholder="Enter subcategory"
                       className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     />
@@ -846,12 +697,8 @@ function AdminEditProduct() {
 
                     <textarea
                       name="description"
-                      value={
-                        formData.description
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.description}
+                      onChange={handleChange}
                       rows={5}
                       placeholder="Describe the product..."
                       className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
@@ -869,8 +716,7 @@ function AdminEditProduct() {
                   </h2>
 
                   <p className="mt-1 text-xs text-slate-500">
-                    Set pricing and minimum order
-                    information.
+                    Set pricing and minimum order information.
                   </p>
                 </div>
 
@@ -887,9 +733,7 @@ function AdminEditProduct() {
                       min="0"
                       name="price"
                       value={formData.price}
-                      onChange={
-                        handleChange
-                      }
+                      onChange={handleChange}
                       placeholder="Enter price"
                       className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     />
@@ -905,12 +749,8 @@ function AdminEditProduct() {
                     <input
                       type="text"
                       name="priceUnit"
-                      value={
-                        formData.priceUnit
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.priceUnit}
+                      onChange={handleChange}
                       placeholder="e.g. Per Piece"
                       className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     />
@@ -928,9 +768,7 @@ function AdminEditProduct() {
                       min="0"
                       name="moq"
                       value={formData.moq}
-                      onChange={
-                        handleChange
-                      }
+                      onChange={handleChange}
                       placeholder="Enter MOQ"
                       className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     />
@@ -946,12 +784,8 @@ function AdminEditProduct() {
                     <input
                       type="text"
                       name="moqUnit"
-                      value={
-                        formData.moqUnit
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.moqUnit}
+                      onChange={handleChange}
                       placeholder="e.g. Piece"
                       className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     />
@@ -966,29 +800,17 @@ function AdminEditProduct() {
 
                     <select
                       name="availability"
-                      value={
-                        formData.availability
-                      }
-                      onChange={
-                        handleChange
-                      }
+                      value={formData.availability}
+                      onChange={handleChange}
                       className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     >
-                      <option value="Available">
-                        Available
-                      </option>
+                      <option value="Available">Available</option>
 
-                      <option value="Limited Stock">
-                        Limited Stock
-                      </option>
+                      <option value="Limited Stock">Limited Stock</option>
 
-                      <option value="Made to Order">
-                        Made to Order
-                      </option>
+                      <option value="Made to Order">Made to Order</option>
 
-                      <option value="Out of Stock">
-                        Out of Stock
-                      </option>
+                      <option value="Out of Stock">Out of Stock</option>
                     </select>
                   </div>
                 </div>
@@ -1003,14 +825,9 @@ function AdminEditProduct() {
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="mb-5">
                   <div className="flex items-center gap-2">
-                    <ImageIcon
-                      size={19}
-                      className="text-blue-600"
-                    />
+                    <ImageIcon size={19} className="text-blue-600" />
 
-                    <h2 className="font-bold text-slate-900">
-                      Product Image
-                    </h2>
+                    <h2 className="font-bold text-slate-900">Product Image</h2>
                   </div>
 
                   <p className="mt-1 text-xs text-slate-500">
@@ -1028,9 +845,7 @@ function AdminEditProduct() {
 
                     <button
                       type="button"
-                      onClick={
-                        handleRemoveImage
-                      }
+                      onClick={handleRemoveImage}
                       className="absolute right-3 top-3 rounded-lg bg-white p-2 text-red-500 shadow-md transition hover:bg-red-50"
                     >
                       <Trash2 size={17} />
@@ -1039,9 +854,7 @@ function AdminEditProduct() {
                 ) : (
                   <div className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 text-center">
                     <div className="mb-3 rounded-xl bg-white p-3 text-slate-400 shadow-sm">
-                      <ImageIcon
-                        size={25}
-                      />
+                      <ImageIcon size={25} />
                     </div>
 
                     <p className="text-sm font-semibold text-slate-700">
@@ -1057,16 +870,12 @@ function AdminEditProduct() {
                 <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                   <Upload size={17} />
 
-                  {imageFile
-                    ? "Change Image"
-                    : "Upload Image"}
+                  {imageFile ? "Change Image" : "Upload Image"}
 
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={
-                      handleImageChange
-                    }
+                    onChange={handleImageChange}
                     className="hidden"
                   />
                 </label>
@@ -1076,10 +885,7 @@ function AdminEditProduct() {
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="mb-4 flex items-center gap-2">
-                  <Building2
-                    size={19}
-                    className="text-blue-600"
-                  />
+                  <Building2 size={19} className="text-blue-600" />
 
                   <h2 className="font-bold text-slate-900">
                     Listing Information
@@ -1091,9 +897,7 @@ function AdminEditProduct() {
                     Product ID
                   </p>
 
-                  <p className="mt-1 text-sm font-bold text-slate-800">
-                    #{id}
-                  </p>
+                  <p className="mt-1 text-sm font-bold text-slate-800">#{id}</p>
                 </div>
               </section>
 
@@ -1107,17 +911,12 @@ function AdminEditProduct() {
                 >
                   {submitting ? (
                     <>
-                      <RefreshCw
-                        size={18}
-                        className="animate-spin"
-                      />
-
+                      <RefreshCw size={18} className="animate-spin" />
                       Saving Changes...
                     </>
                   ) : (
                     <>
                       <Save size={18} />
-
                       Save Changes
                     </>
                   )}
@@ -1135,7 +934,7 @@ function AdminEditProduct() {
         </main>
       </div>
     </div>
-  )
+  );
 }
 
-export default AdminEditProduct
+export default AdminEditProduct;

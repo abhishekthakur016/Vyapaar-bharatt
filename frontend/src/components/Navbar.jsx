@@ -25,8 +25,8 @@ function Navbar() {
     const loadCategories = async () => {
       try {
         const [productsResponse, suppliersResponse] = await Promise.all([
-          fetch("http://localhost:5000/api/products"),
-          fetch("http://localhost:5000/api/suppliers"),
+          fetch("/api/products"),
+          fetch("/api/suppliers"),
         ]);
 
         const productsData = await productsResponse.json();
@@ -99,7 +99,6 @@ function Navbar() {
                 className="flex items-center gap-1 text-sm font-semibold text-gray-700 transition hover:text-[#0952d4]"
               >
                 All Categories
-
                 <ChevronDown
                   size={15}
                   className={`transition-transform ${
@@ -116,7 +115,7 @@ function Navbar() {
                         <Link
                           key={category}
                           to={`/products?category=${encodeURIComponent(
-                            category
+                            category,
                           )}`}
                           onClick={() => setCategoriesOpen(false)}
                           className="block rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-blue-50 hover:text-[#0952d4]"
@@ -262,7 +261,7 @@ function Navbar() {
                       <Link
                         key={category}
                         to={`/products?category=${encodeURIComponent(
-                          category
+                          category,
                         )}`}
                         onClick={() => {
                           setCategoriesOpen(false);

@@ -62,9 +62,7 @@ function RequirementDetails() {
         setLoading(true);
         setError("");
 
-        const response = await fetch(
-          `http://localhost:5000/api/requirements/${id}`,
-        );
+        const response = await fetch(`/api/requirements/${id}`);
 
         const data = await response.json();
 
@@ -94,9 +92,7 @@ function RequirementDetails() {
       setQuotesLoading(true);
       setQuoteError("");
 
-      const response = await fetch(
-        `http://localhost:5000/api/requirements/${id}/quotes`,
-      );
+      const response = await fetch(`/api/requirements/${id}/quotes`);
 
       const data = await response.json();
 
@@ -154,7 +150,7 @@ function RequirementDetails() {
     setQuoteSubmitted(false);
 
     try {
-      const response = await fetch("http://localhost:5000/api/quotes", {
+      const response = await fetch("/api/quotes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -194,9 +190,7 @@ function RequirementDetails() {
       await fetchQuotes();
 
       // Refresh requirement
-      const requirementResponse = await fetch(
-        `http://localhost:5000/api/requirements/${id}`,
-      );
+      const requirementResponse = await fetch(`/api/requirements/${id}`);
 
       const requirementData = await requirementResponse.json();
 
@@ -236,18 +230,15 @@ function RequirementDetails() {
 
       setQuoteActionError("");
 
-      const response = await fetch(
-        `http://localhost:5000/api/quotes/${quoteId}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status,
-          }),
+      const response = await fetch(`/api/quotes/${quoteId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          status,
+        }),
+      });
 
       const data = await response.json();
 
@@ -259,9 +250,7 @@ function RequirementDetails() {
       await fetchQuotes();
 
       // Refresh requirement status
-      const requirementResponse = await fetch(
-        `http://localhost:5000/api/requirements/${id}`,
-      );
+      const requirementResponse = await fetch(`/api/requirements/${id}`);
 
       const requirementData = await requirementResponse.json();
 

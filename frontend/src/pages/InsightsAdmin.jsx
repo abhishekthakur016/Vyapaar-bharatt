@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Edit3,
@@ -7,8 +7,8 @@ import {
   Save,
   Trash2,
   X,
-} from "lucide-react"
-import { Link } from "react-router-dom"
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const emptyForm = {
   title: "",
@@ -17,7 +17,7 @@ const emptyForm = {
   excerpt: "",
   content: "",
   image_url: "",
-}
+};
 
 const categories = [
   { name: "Market Insights", id: "market-insights" },
@@ -26,68 +26,68 @@ const categories = [
   { name: "Business Tips", id: "business-tips" },
   { name: "Trade & Export", id: "trade-export" },
   { name: "Manufacturing", id: "manufacturing" },
-]
+];
 
 function InsightsAdmin() {
-  const [insights, setInsights] = useState([])
-  const [form, setForm] = useState(emptyForm)
-  const [editingId, setEditingId] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState(null)
-  const [message, setMessage] = useState("")
-  const [error, setError] = useState("")
+  const [insights, setInsights] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const fetchInsights = async () => {
     try {
-      setLoading(true)
-      const response = await fetch("http://localhost:5000/api/insights")
-      const data = await response.json()
+      setLoading(true);
+      const response = await fetch("/api/insights");
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to fetch insights")
+        throw new Error(data.message || "Failed to fetch insights");
       }
 
-      setInsights(data.insights || [])
+      setInsights(data.insights || []);
     } catch (err) {
-      setError(err.message || "Unable to load insights.")
+      setError(err.message || "Unable to load insights.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchInsights()
-  }, [])
+    fetchInsights();
+  }, []);
 
   const handleCategoryChange = (value) => {
-    const category = categories.find((item) => item.name === value)
+    const category = categories.find((item) => item.name === value);
 
     setForm((current) => ({
       ...current,
       category: value,
       category_id: category?.id || "",
-    }))
-  }
+    }));
+  };
 
   const handleChange = (event) => {
-    const { name, value } = event.target
+    const { name, value } = event.target;
 
     setForm((current) => ({
       ...current,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const resetForm = () => {
-    setForm(emptyForm)
-    setEditingId(null)
-    setMessage("")
-    setError("")
-  }
+    setForm(emptyForm);
+    setEditingId(null);
+    setMessage("");
+    setError("");
+  };
 
   const startEdit = (insight) => {
-    setEditingId(insight.id)
+    setEditingId(insight.id);
 
     setForm({
       title: insight.title || "",
@@ -96,25 +96,23 @@ function InsightsAdmin() {
       excerpt: insight.excerpt || "",
       content: insight.content || "",
       image_url: insight.image_url || "",
-    })
+    });
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
     try {
-      setSaving(true)
-      setMessage("")
-      setError("")
+      setSaving(true);
+      setMessage("");
+      setError("");
 
-      const url = editingId
-        ? `http://localhost:5000/api/insights/${editingId}`
-        : "http://localhost:5000/api/insights"
+      const url = editingId ? `/api/insights/${editingId}` : "/api/insights";
 
       const response = await fetch(url, {
         method: editingId ? "PUT" : "POST",
@@ -122,67 +120,63 @@ function InsightsAdmin() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to save insight")
+        throw new Error(data.message || "Failed to save insight");
       }
 
       setMessage(
         editingId
           ? "Insight updated successfully."
-          : "Insight created successfully."
-      )
+          : "Insight created successfully.",
+      );
 
-      resetForm()
-      await fetchInsights()
+      resetForm();
+      await fetchInsights();
     } catch (err) {
-      setError(err.message || "Unable to save insight.")
+      setError(err.message || "Unable to save insight.");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this insight?"
-    )
+      "Are you sure you want to delete this insight?",
+    );
 
-    if (!confirmed) return
+    if (!confirmed) return;
 
     try {
-      setDeletingId(id)
-      setError("")
-      setMessage("")
+      setDeletingId(id);
+      setError("");
+      setMessage("");
 
-      const response = await fetch(
-        `http://localhost:5000/api/insights/${id}`,
-        {
-          method: "DELETE",
-        }
-      )
+      const response = await fetch(`/api/insights/${id}`, {
+        method: "DELETE",
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to delete insight")
+        throw new Error(data.message || "Failed to delete insight");
       }
 
-      setMessage("Insight deleted successfully.")
-      await fetchInsights()
+      setMessage("Insight deleted successfully.");
+      await fetchInsights();
     } catch (err) {
-      setError(err.message || "Unable to delete insight.")
+      setError(err.message || "Unable to delete insight.");
     } finally {
-      setDeletingId(null)
+      setDeletingId(null);
     }
-  }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <Link
@@ -241,7 +235,6 @@ function InsightsAdmin() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
             <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -265,9 +258,7 @@ function InsightsAdmin() {
 
                 <select
                   value={form.category}
-                  onChange={(event) =>
-                    handleCategoryChange(event.target.value)
-                  }
+                  onChange={(event) => handleCategoryChange(event.target.value)}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-[#0952d4] focus:ring-2 focus:ring-blue-100"
                 >
                   {categories.map((category) => (
@@ -323,7 +314,7 @@ function InsightsAdmin() {
                   alt="Insight preview"
                   className="h-48 w-full object-cover"
                   onError={(event) => {
-                    event.currentTarget.style.display = "none"
+                    event.currentTarget.style.display = "none";
                   }}
                 />
               </div>
@@ -363,9 +354,7 @@ function InsightsAdmin() {
         {/* LIST */}
         <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 p-6">
-            <h2 className="text-xl font-bold text-[#0b1f3a]">
-              All Insights
-            </h2>
+            <h2 className="text-xl font-bold text-[#0b1f3a]">All Insights</h2>
 
             <p className="mt-1 text-sm text-slate-500">
               {insights.length} insight{insights.length !== 1 ? "s" : ""}
@@ -447,10 +436,9 @@ function InsightsAdmin() {
             </div>
           )}
         </section>
-
       </div>
     </main>
-  )
+  );
 }
 
-export default InsightsAdmin
+export default InsightsAdmin;

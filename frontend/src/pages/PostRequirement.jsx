@@ -1,11 +1,6 @@
-import {
-  FileText,
-  ShieldCheck,
-  Users,
-  ArrowLeft,
-} from "lucide-react"
+import { FileText, ShieldCheck, Users, ArrowLeft } from "lucide-react";
 
-import { useState } from "react"
+import { useState } from "react";
 
 function PostRequirement() {
   const [formData, setFormData] = useState({
@@ -19,77 +14,74 @@ function PostRequirement() {
     maxBudget: "",
     deliveryLocation: "",
     requiredBy: "",
-  })
+  });
 
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
+    }));
 
-    setSubmitted(false)
-  }
+    setSubmitted(false);
+  };
 
- const handleSubmit = async (e) => {
-  e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const response = await fetch("http://localhost:5000/api/requirements", {
-      method: "POST",
-      headers: {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("vyapaar_token")}`,
-},
-      body: JSON.stringify(formData),
-    })
+    try {
+      const response = await fetch("/api/requirements", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("vyapaar_token")}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await response.json()
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to submit requirement")
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit requirement");
+      }
+
+      console.log("Requirement created:", data.requirement);
+
+      setSubmitted(true);
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+
+      // Clear form after successful submission
+      setFormData({
+        title: "",
+        category: "",
+        subcategory: "",
+        quantity: "",
+        unit: "",
+        description: "",
+        minBudget: "",
+        maxBudget: "",
+        deliveryLocation: "",
+        requiredBy: "",
+      });
+    } catch (error) {
+      console.error("Submission error:", error);
+
+      alert("Something went wrong. Please try again.");
     }
-
-    console.log("Requirement created:", data.requirement)
-
-    setSubmitted(true)
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    })
-
-    // Clear form after successful submission
-    setFormData({
-      title: "",
-      category: "",
-      subcategory: "",
-      quantity: "",
-      unit: "",
-      description: "",
-      minBudget: "",
-      maxBudget: "",
-      deliveryLocation: "",
-      requiredBy: "",
-    })
-
-  } catch (error) {
-    console.error("Submission error:", error)
-
-    alert("Something went wrong. Please try again.")
-  }
-}
+  };
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-
       {/* Page Header */}
       <section className="bg-[#0952d4] py-14 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
           <button
             type="button"
             onClick={() => window.history.back()}
@@ -100,12 +92,8 @@ function PostRequirement() {
           </button>
 
           <div className="max-w-3xl">
-
             <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white">
-              <FileText
-                size={27}
-                className="text-[#0952d4]"
-              />
+              <FileText size={27} className="text-[#0952d4]" />
             </div>
 
             <p className="text-xs font-black uppercase tracking-[0.2em] text-white/60">
@@ -120,25 +108,18 @@ function PostRequirement() {
               Tell verified suppliers what you need and receive competitive
               quotes from businesses that match your requirement.
             </p>
-
           </div>
         </div>
       </section>
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-
         {/* Success Message */}
         {submitted && (
           <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 p-5">
-
             <div className="flex items-start gap-3">
-
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100">
-                <ShieldCheck
-                  size={20}
-                  className="text-green-600"
-                />
+                <ShieldCheck size={20} className="text-green-600" />
               </div>
 
               <div>
@@ -150,17 +131,13 @@ function PostRequirement() {
                   We’ll match your requirement with relevant suppliers.
                 </p>
               </div>
-
             </div>
-
           </div>
         )}
 
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-
           {/* Form Area */}
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
-
             <div className="mb-8">
               <h2 className="text-xl font-black text-[#0b1f3a]">
                 Tell us what you need
@@ -173,20 +150,13 @@ function PostRequirement() {
             </div>
 
             <form onSubmit={handleSubmit}>
-
               <div className="space-y-8">
-
                 {/* REQUIREMENT DETAILS */}
 
                 <div className="border-b border-gray-100 pb-6">
-
                   <div className="flex items-center gap-3">
-
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0952d4]/10">
-                      <FileText
-                        size={20}
-                        className="text-[#0952d4]"
-                      />
+                      <FileText size={20} className="text-[#0952d4]" />
                     </div>
 
                     <div>
@@ -199,14 +169,11 @@ function PostRequirement() {
                         need.
                       </p>
                     </div>
-
                   </div>
-
                 </div>
 
                 {/* Requirement Title */}
                 <div>
-
                   <label
                     htmlFor="requirement-title"
                     className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -230,14 +197,11 @@ function PostRequirement() {
                     Keep it short and specific so the right suppliers can find
                     your request.
                   </p>
-
                 </div>
 
                 {/* Category + Subcategory */}
                 <div className="grid gap-5 sm:grid-cols-2">
-
                   <div>
-
                     <label
                       htmlFor="category"
                       className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -270,11 +234,9 @@ function PostRequirement() {
                       <option>Renewable Energy</option>
                       <option>Industrial Supplies</option>
                     </select>
-
                   </div>
 
                   <div>
-
                     <label
                       htmlFor="subcategory"
                       className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -291,16 +253,12 @@ function PostRequirement() {
                       placeholder="e.g. Solar Panels"
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-[#0b1f3a] outline-none transition placeholder:text-gray-400 focus:border-[#0952d4] focus:ring-4 focus:ring-[#0952d4]/10"
                     />
-
                   </div>
-
                 </div>
 
                 {/* Quantity + Unit */}
                 <div className="grid gap-5 sm:grid-cols-2">
-
                   <div>
-
                     <label
                       htmlFor="quantity"
                       className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -320,11 +278,9 @@ function PostRequirement() {
                       required
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-[#0b1f3a] outline-none transition placeholder:text-gray-400 focus:border-[#0952d4] focus:ring-4 focus:ring-[#0952d4]/10"
                     />
-
                   </div>
 
                   <div>
-
                     <label
                       htmlFor="unit"
                       className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -355,14 +311,11 @@ function PostRequirement() {
                       <option>Liter</option>
                       <option>Other</option>
                     </select>
-
                   </div>
-
                 </div>
 
                 {/* Requirement Description */}
                 <div>
-
                   <label
                     htmlFor="description"
                     className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -386,15 +339,12 @@ function PostRequirement() {
                     The more details you provide, the better suppliers can
                     respond.
                   </p>
-
                 </div>
 
                 {/* BUDGET & DELIVERY */}
 
                 <div className="border-t border-gray-100 pt-8">
-
                   <div className="mb-6">
-
                     <h3 className="text-lg font-black text-[#0b1f3a]">
                       Budget & Delivery
                     </h3>
@@ -403,15 +353,12 @@ function PostRequirement() {
                       Help suppliers understand your budget and delivery
                       expectations.
                     </p>
-
                   </div>
 
                   {/* Budget */}
                   <div className="grid gap-5 sm:grid-cols-2">
-
                     {/* Minimum Budget */}
                     <div>
-
                       <label
                         htmlFor="min-budget"
                         className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -420,7 +367,6 @@ function PostRequirement() {
                       </label>
 
                       <div className="flex overflow-hidden rounded-xl border border-gray-200 bg-white transition focus-within:border-[#0952d4] focus-within:ring-4 focus-within:ring-[#0952d4]/10">
-
                         <span className="flex items-center border-r border-gray-200 bg-[#f8fafc] px-4 text-sm font-bold text-gray-500">
                           ₹
                         </span>
@@ -435,14 +381,11 @@ function PostRequirement() {
                           placeholder="e.g. 50000"
                           className="min-w-0 flex-1 px-4 py-3.5 text-sm text-[#0b1f3a] outline-none placeholder:text-gray-400"
                         />
-
                       </div>
-
                     </div>
 
                     {/* Maximum Budget */}
                     <div>
-
                       <label
                         htmlFor="max-budget"
                         className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -451,7 +394,6 @@ function PostRequirement() {
                       </label>
 
                       <div className="flex overflow-hidden rounded-xl border border-gray-200 bg-white transition focus-within:border-[#0952d4] focus-within:ring-4 focus-within:ring-[#0952d4]/10">
-
                         <span className="flex items-center border-r border-gray-200 bg-[#f8fafc] px-4 text-sm font-bold text-gray-500">
                           ₹
                         </span>
@@ -466,16 +408,12 @@ function PostRequirement() {
                           placeholder="e.g. 100000"
                           className="min-w-0 flex-1 px-4 py-3.5 text-sm text-[#0b1f3a] outline-none placeholder:text-gray-400"
                         />
-
                       </div>
-
                     </div>
-
                   </div>
 
                   {/* Delivery Location */}
                   <div className="mt-5">
-
                     <label
                       htmlFor="delivery-location"
                       className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -494,12 +432,10 @@ function PostRequirement() {
                       required
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-[#0b1f3a] outline-none transition placeholder:text-gray-400 focus:border-[#0952d4] focus:ring-4 focus:ring-[#0952d4]/10"
                     />
-
                   </div>
 
                   {/* Required By */}
                   <div className="mt-5">
-
                     <label
                       htmlFor="required-by"
                       className="mb-2 block text-sm font-bold text-[#0b1f3a]"
@@ -515,18 +451,13 @@ function PostRequirement() {
                       onChange={handleChange}
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-[#0b1f3a] outline-none transition focus:border-[#0952d4] focus:ring-4 focus:ring-[#0952d4]/10 sm:w-1/2"
                     />
-
                   </div>
-
                 </div>
 
                 {/* Submit Requirement */}
                 <div className="border-t border-gray-100 pt-8">
-
                   <div className="rounded-xl bg-[#f8fafc] p-5">
-
                     <div className="flex items-start gap-3">
-
                       <ShieldCheck
                         size={20}
                         className="mt-0.5 shrink-0 text-[#0952d4]"
@@ -542,9 +473,7 @@ function PostRequirement() {
                           suppliers to help you receive suitable quotes.
                         </p>
                       </div>
-
                     </div>
-
                   </div>
 
                   <button
@@ -552,46 +481,31 @@ function PostRequirement() {
                     className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#fd8836] px-6 py-4 text-sm font-black text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#f77925] hover:shadow-md"
                   >
                     Submit Requirement
-
-                    <ArrowLeft
-                      size={18}
-                      className="rotate-180"
-                    />
+                    <ArrowLeft size={18} className="rotate-180" />
                   </button>
 
                   <p className="mt-3 text-center text-xs text-gray-400">
                     By submitting, you agree to our Terms & Conditions and
                     Privacy Policy.
                   </p>
-
                 </div>
-
               </div>
-
             </form>
-
           </div>
 
           {/* Sidebar */}
           <aside className="space-y-4">
-
             {/* Why Post Requirement */}
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-
               <h3 className="font-black text-[#0b1f3a]">
                 Why post a requirement?
               </h3>
 
               <div className="mt-5 space-y-5">
-
                 {/* Verified Suppliers */}
                 <div className="flex gap-3">
-
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0952d4]/10">
-                    <ShieldCheck
-                      size={20}
-                      className="text-[#0952d4]"
-                    />
+                    <ShieldCheck size={20} className="text-[#0952d4]" />
                   </div>
 
                   <div>
@@ -603,17 +517,12 @@ function PostRequirement() {
                       Connect with relevant verified businesses.
                     </p>
                   </div>
-
                 </div>
 
                 {/* Multiple Responses */}
                 <div className="flex gap-3">
-
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fd8836]/10">
-                    <Users
-                      size={20}
-                      className="text-[#fd8836]"
-                    />
+                    <Users size={20} className="text-[#fd8836]" />
                   </div>
 
                   <div>
@@ -625,17 +534,12 @@ function PostRequirement() {
                       Receive quotes from suppliers matching your needs.
                     </p>
                   </div>
-
                 </div>
 
                 {/* Compare Quotes */}
                 <div className="flex gap-3">
-
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0952d4]/10">
-                    <FileText
-                      size={20}
-                      className="text-[#0952d4]"
-                    />
+                    <FileText size={20} className="text-[#0952d4]" />
                   </div>
 
                   <div>
@@ -647,16 +551,12 @@ function PostRequirement() {
                       Compare pricing, MOQ and delivery terms.
                     </p>
                   </div>
-
                 </div>
-
               </div>
-
             </div>
 
             {/* Help Card */}
             <div className="rounded-2xl bg-[#0b1f3a] p-6">
-
               <p className="text-xs font-bold uppercase tracking-wider text-white/50">
                 Need Help?
               </p>
@@ -669,16 +569,12 @@ function PostRequirement() {
                 Don't worry. We'll guide you through each step of your
                 requirement.
               </p>
-
             </div>
-
           </aside>
-
         </div>
       </main>
-
     </div>
-  )
+  );
 }
 
-export default PostRequirement
+export default PostRequirement;

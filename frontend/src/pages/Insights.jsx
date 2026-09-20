@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
-import { Link, useSearchParams } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   BarChart3,
@@ -10,9 +10,9 @@ import {
   Search,
   TrendingUp,
   X,
-} from "lucide-react"
+} from "lucide-react";
 
-import { insightCategories } from "../data/insights"
+import { insightCategories } from "../data/insights";
 
 const categoryIcons = {
   chart: BarChart3,
@@ -21,106 +21,100 @@ const categoryIcons = {
   bulb: Lightbulb,
   globe: Globe2,
   factory: Factory,
-}
+};
 
 function Insights() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const selectedCategory = searchParams.get("category") || "all"
+  const selectedCategory = searchParams.get("category") || "all";
 
-  const [search, setSearch] = useState("")
-  const [insights, setInsights] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const [search, setSearch] = useState("");
+  const [insights, setInsights] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchInsights = async () => {
       try {
-        setLoading(true)
-        setError("")
+        setLoading(true);
+        setError("");
 
-        const response = await fetch("http://localhost:5000/api/insights")
-        const data = await response.json()
+        const response = await fetch("/api/insights");
+        const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(data.message || "Failed to fetch insights")
+          throw new Error(data.message || "Failed to fetch insights");
         }
 
-        setInsights(data.insights || [])
+        setInsights(data.insights || []);
       } catch (err) {
-        console.error("Error fetching insights:", err)
-        setError(err.message || "Unable to load insights.")
+        console.error("Error fetching insights:", err);
+        setError(err.message || "Unable to load insights.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchInsights()
-  }, [])
+    fetchInsights();
+  }, []);
 
   const filteredInsights = useMemo(() => {
     return insights.filter((insight) => {
       const matchesCategory =
-        selectedCategory === "all" ||
-        insight.categoryId === selectedCategory
+        selectedCategory === "all" || insight.categoryId === selectedCategory;
 
-      const searchText = search.toLowerCase().trim()
+      const searchText = search.toLowerCase().trim();
 
       const matchesSearch =
         !searchText ||
         insight.title.toLowerCase().includes(searchText) ||
         insight.excerpt.toLowerCase().includes(searchText) ||
-        insight.category.toLowerCase().includes(searchText)
+        insight.category.toLowerCase().includes(searchText);
 
-      return matchesCategory && matchesSearch
-    })
-  }, [selectedCategory, search, insights])
+      return matchesCategory && matchesSearch;
+    });
+  }, [selectedCategory, search, insights]);
 
-  const featuredInsights = insights.slice(0, 3)
+  const featuredInsights = insights.slice(0, 3);
 
   const selectCategory = (categoryId) => {
     if (categoryId === "all") {
-      setSearchParams({})
-      return
+      setSearchParams({});
+      return;
     }
 
-    setSearchParams({ category: categoryId })
-  }
+    setSearchParams({ category: categoryId });
+  };
 
   const clearFilters = () => {
-    setSearch("")
-    setSearchParams({})
-  }
+    setSearch("");
+    setSearchParams({});
+  };
 
   return (
     <main className="bg-white">
-
       {/* HERO */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-
           <div className="mb-4 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
             VYAPAAR BHARAT INSIGHTS
           </div>
 
           <Link
-  to="/admin/insights"
-  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#0952d4] hover:text-[#0952d4]"
->
-  Manage Insights
-</Link>
+            to="/admin/insights"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#0952d4] hover:text-[#0952d4]"
+          >
+            Manage Insights
+          </Link>
 
           <h1 className="max-w-2xl text-4xl font-bold leading-tight text-[#0b1f3a] sm:text-5xl">
             Insights to Help Your
-            <span className="block text-[#0952d4]">
-              Business Grow
-            </span>
+            <span className="block text-[#0952d4]">Business Grow</span>
           </h1>
 
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
-            Explore market insights, industry trends, sourcing guides,
-            business tips, and trade opportunities to make better
-            business decisions.
+            Explore market insights, industry trends, sourcing guides, business
+            tips, and trade opportunities to make better business decisions.
           </p>
 
           {/* SEARCH */}
@@ -155,7 +149,6 @@ function Insights() {
       {/* CATEGORIES */}
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-
           <div className="mb-7">
             <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
               EXPLORE
@@ -166,7 +159,8 @@ function Insights() {
             </h2>
 
             <p className="mt-2 text-sm text-slate-500">
-              Explore insights designed to help businesses make smarter decisions.
+              Explore insights designed to help businesses make smarter
+              decisions.
             </p>
           </div>
 
@@ -184,9 +178,9 @@ function Insights() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {insightCategories.map((category) => {
-              const Icon = categoryIcons[category.icon]
+              const Icon = categoryIcons[category.icon];
 
-              const active = selectedCategory === category.id
+              const active = selectedCategory === category.id;
 
               return (
                 <button
@@ -202,9 +196,7 @@ function Insights() {
                     <Icon size={19} />
                   </div>
 
-                  <h3 className="font-bold text-[#0b1f3a]">
-                    {category.name}
-                  </h3>
+                  <h3 className="font-bold text-[#0b1f3a]">{category.name}</h3>
 
                   <p className="mt-2 text-xs leading-5 text-slate-500">
                     {category.description}
@@ -218,7 +210,7 @@ function Insights() {
                     />
                   </span>
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -227,7 +219,6 @@ function Insights() {
       {/* INSIGHT RESULTS */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-
           <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
@@ -238,7 +229,7 @@ function Insights() {
                 {selectedCategory === "all"
                   ? "All Insights"
                   : insightCategories.find(
-                      (item) => item.id === selectedCategory
+                      (item) => item.id === selectedCategory,
                     )?.name}
               </h2>
 
@@ -272,9 +263,7 @@ function Insights() {
                 Unable to load insights
               </h3>
 
-              <p className="mt-2 text-sm text-red-600">
-                {error}
-              </p>
+              <p className="mt-2 text-sm text-red-600">{error}</p>
 
               <button
                 onClick={() => window.location.reload()}
@@ -285,10 +274,7 @@ function Insights() {
             </div>
           ) : filteredInsights.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-300 py-16 text-center">
-              <Search
-                size={35}
-                className="mx-auto text-slate-300"
-              />
+              <Search size={35} className="mx-auto text-slate-300" />
 
               <h3 className="mt-4 font-bold text-[#0b1f3a]">
                 No insights found
@@ -312,20 +298,20 @@ function Insights() {
                   key={insight.id}
                   className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg"
                 >
-                 <div
-  className="relative flex h-36 items-end bg-slate-200 bg-cover bg-center p-5"
-  style={{
-    backgroundImage: insight.image_url
-      ? `url(${insight.image_url})`
-      : undefined,
-  }}
->
-  <div className="absolute inset-0 bg-black/30" />
+                  <div
+                    className="relative flex h-36 items-end bg-slate-200 bg-cover bg-center p-5"
+                    style={{
+                      backgroundImage: insight.image_url
+                        ? `url(${insight.image_url})`
+                        : undefined,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/30" />
 
-  <span className="relative z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-    {insight.category}
-  </span>
-</div>
+                    <span className="relative z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                      {insight.category}
+                    </span>
+                  </div>
 
                   <div className="p-5">
                     <h3 className="text-base font-bold leading-6 text-[#0b1f3a]">
@@ -355,75 +341,77 @@ function Insights() {
       </section>
 
       {/* FEATURED */}
-      {!loading && !error && selectedCategory === "all" && !search && insights.length > 0 && (
-        <section className="border-b border-slate-200 bg-slate-50">
-          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {!loading &&
+        !error &&
+        selectedCategory === "all" &&
+        !search &&
+        insights.length > 0 && (
+          <section className="border-b border-slate-200 bg-slate-50">
+            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+              <div className="mb-7 flex items-end justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
+                    FEATURED
+                  </p>
 
-            <div className="mb-7 flex items-end justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
-                  FEATURED
-                </p>
+                  <h2 className="mt-1 text-2xl font-bold text-[#0b1f3a]">
+                    Featured Insights
+                  </h2>
+                </div>
 
-                <h2 className="mt-1 text-2xl font-bold text-[#0b1f3a]">
-                  Featured Insights
-                </h2>
+                <button
+                  onClick={() => selectCategory("all")}
+                  className="hidden text-xs font-semibold text-[#0952d4] sm:block"
+                >
+                  View all insights →
+                </button>
               </div>
 
-              <button
-                onClick={() => selectCategory("all")}
-                className="hidden text-xs font-semibold text-[#0952d4] sm:block"
-              >
-                View all insights →
-              </button>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-3">
-              {featuredInsights.map((insight) => (
-                <Link
-                  key={insight.id}
-                  to={`/insights/${insight.id}`}
-                  className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg"
-                >
-                  <div
-                    className="relative flex h-36 items-end bg-slate-200 bg-cover bg-center p-5"
-                    style={{
-                      backgroundImage: insight.image_url
-                        ? `url(${insight.image_url})`
-                        : undefined,
-                    }}
+              <div className="grid gap-5 md:grid-cols-3">
+                {featuredInsights.map((insight) => (
+                  <Link
+                    key={insight.id}
+                    to={`/insights/${insight.id}`}
+                    className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg"
                   >
-                    <div className="absolute inset-0 bg-black/30" />
+                    <div
+                      className="relative flex h-36 items-end bg-slate-200 bg-cover bg-center p-5"
+                      style={{
+                        backgroundImage: insight.image_url
+                          ? `url(${insight.image_url})`
+                          : undefined,
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-black/30" />
 
-                    <span className="relative z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-                      {insight.category}
-                    </span>
-                  </div>
+                      <span className="relative z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                        {insight.category}
+                      </span>
+                    </div>
 
-                  <div className="p-5">
-                    <h3 className="text-sm font-bold leading-6 text-[#0b1f3a]">
-                      {insight.title}
-                    </h3>
+                    <div className="p-5">
+                      <h3 className="text-sm font-bold leading-6 text-[#0b1f3a]">
+                        {insight.title}
+                      </h3>
 
-                    <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#0952d4]">
-                      Read More
-                      <ArrowRight
-                        size={14}
-                        className="transition group-hover:translate-x-1"
-                      />
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                      <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#0952d4]">
+                        Read More
+                        <ArrowRight
+                          size={14}
+                          className="transition group-hover:translate-x-1"
+                        />
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
 
       {/* CTA */}
       <section className="bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl rounded-xl bg-[#0b1f3a] px-6 py-10 text-center sm:px-10">
-
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white">
             <Globe2 size={19} />
           </div>
@@ -446,9 +434,8 @@ function Insights() {
           </Link>
         </div>
       </section>
-
     </main>
-  )
+  );
 }
 
-export default Insights
+export default Insights;
