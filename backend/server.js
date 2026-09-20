@@ -2037,7 +2037,7 @@ app.post(
 
       const imageUrls = req.files.map(
         (file) =>
-          `http://localhost:${process.env.PORT || 5000}/uploads/companies/${file.filename}`,
+          `/uploads/companies/${file.filename}`,
       );
 
       res.status(201).json({
