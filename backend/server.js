@@ -1559,7 +1559,7 @@ app.get("/api/suppliers", async (req, res) => {
 // Get Single Supplier
 // ===============================
 
-app.get("/api/suppliers/:id", async (req, res) => {
+app.get("/api/suppliers/:id([0-9]+)", async (req, res) => {
   try {
     const { id } = req.params;
 
