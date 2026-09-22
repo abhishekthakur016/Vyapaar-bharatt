@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -61,35 +62,112 @@ function Home() {
 function App() {
   const location = useLocation();
 
+  // =========================
+  // AUTH STATE
+  // =========================
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const token = localStorage.getItem("vyapaar_token");
+    const user = localStorage.getItem("vyapaar_user");
+
+    return Boolean(token && user);
+  });
+
+  // =========================
+  // LOGIN POPUP STATE
+  // =========================
+
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  // =========================
+  // SHOW LOGIN POPUP AFTER 5 SEC
+  // =========================
+
+  useEffect(() => {
+    // If already logged in,
+    // make sure popup stays hidden.
+    if (isLoggedIn) {
+      setShowLoginPopup(false);
+      return;
+    }
+
+    // Wait 5 seconds before showing popup.
+    const timer = setTimeout(() => {
+      setShowLoginPopup(true);
+    }, 5000);
+
+    // Clear timer if component unmounts
+    // or isLoggedIn changes.
+    return () => clearTimeout(timer);
+  }, [isLoggedIn]);
+
+  // =========================
+  // ADMIN ROUTE
+  // =========================
+
   const isAdminRoute = location.pathname.startsWith("/admin");
+
+  // =========================
+  // LOGIN PAGE
+  // =========================
+
+  const isLoginPage = location.pathname === "/login";
+
+  // =========================
+  // AUTH SUCCESS
+  // =========================
+
+  const handleLoginSuccess = (user) => {
+    console.log("Login successful:", user);
+
+    // User is now logged in.
+    setIsLoggedIn(true);
+
+    // Close popup immediately.
+    setShowLoginPopup(false);
+  };
+
+  // =========================
+  // LOGOUT EVENT
+  // =========================
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem("vyapaar_token");
+      const user = localStorage.getItem("vyapaar_user");
+
+      setIsLoggedIn(Boolean(token && user));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Public Navbar */}
+      {/* =========================
+          PUBLIC NAVBAR
+      ========================== */}
+
       {!isAdminRoute && <Navbar />}
 
+      {/* =========================
+          ROUTES
+      ========================== */}
+
       <Routes>
-        {/* =========================
-            HOME
-        ========================= */}
+        {/* HOME */}
 
         <Route path="/" element={<Home />} />
 
-        {/* =========================
-            BUYER
-        ========================= */}
+        {/* PUBLIC PAGES */}
 
         <Route path="/for-buyers" element={<ForBuyers />} />
 
-        {/* =========================
-            SUPPLIER DETAILS
-        ========================= */}
-
         <Route path="/suppliers/:id" element={<SupplierDetails />} />
-
-        {/* =========================
-            REQUIREMENTS
-        ========================= */}
 
         <Route path="/post-requirement" element={<PostRequirement />} />
 
@@ -97,80 +175,47 @@ function App() {
 
         <Route path="/requirements/:id" element={<RequirementDetails />} />
 
-        {/* =========================
-            SUPPLIER REQUIREMENTS
-        ========================= */}
-
         <Route
           path="/supplier/requirements"
           element={<SupplierRequirements />}
         />
 
-        {/* =========================
-            PRODUCTS
-        ========================= */}
-
         <Route path="/products" element={<Products />} />
 
         <Route path="/products/:id" element={<ProductDetails />} />
 
-        {/* =========================
-            SUPPLIER RFQs
-        ========================= */}
-
         <Route path="/supplier-rfqs" element={<SupplierRFQs />} />
 
-        {/* =========================
-            INSIGHTS
-        ========================= */}
+        {/* INSIGHTS */}
 
         <Route path="/insights" element={<Insights />} />
 
         <Route path="/insights/:id" element={<InsightDetails />} />
 
-        {/* =========================
-            LOGIN
-        ========================= */}
+        {/* LOGIN PAGE */}
 
         <Route path="/login" element={<Login />} />
 
-        {/* =========================
-            MY REQUIREMENTS
-        ========================= */}
+        {/* USER PAGES */}
 
         <Route path="/my-requirements" element={<MyRequirements />} />
 
-        {/* =========================
-            MY QUOTES
-        ========================= */}
-
         <Route path="/my-quotes" element={<MyQuotes />} />
-
-        {/* =========================
-            MY PROFILE
-        ========================= */}
 
         <Route path="/my-profile" element={<MyProfile />} />
 
-        {/* =====================================================
+        {/* =========================
             ADMIN ROUTES
-            ONLY ADMIN + SUPER ADMIN CAN ACCESS
-        ===================================================== */}
+        ========================== */}
 
         <Route
           element={<ProtectedRoute allowedRoles={["admin", "super_admin"]} />}
         >
-          {/* Admin Dashboard */}
-
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-          {/* Admin Companies */}
 
           <Route path="/admin/companies" element={<AdminCompanies />} />
 
           <Route path="/admin/companies/add" element={<AdminAddCompany />} />
-
-          {/* Admin Products */}
 
           <Route path="/admin/products" element={<AdminProducts />} />
 
@@ -181,27 +226,34 @@ function App() {
             element={<AdminEditProduct />}
           />
 
-          {/* Admin Requirements */}
-
           <Route path="/admin/requirements" element={<AdminRequirements />} />
-
-          {/* Admin Insights */}
 
           <Route path="/admin/insights" element={<InsightsAdmin />} />
         </Route>
 
-        {/* =====================================================
+        {/* =========================
             SUPPLIER ROUTES
-            ONLY SUPPLIER CAN ACCESS
-        ===================================================== */}
+        ========================== */}
 
         <Route element={<ProtectedRoute allowedRoles={["supplier"]} />}>
           <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
         </Route>
       </Routes>
 
-      {/* Public Footer */}
+      {/* =========================
+          FOOTER
+      ========================== */}
+
       {!isAdminRoute && <Footer />}
+
+      {/* =========================
+          GLOBAL LOGIN POPUP
+          SHOW AFTER 5 SECONDS
+      ========================== */}
+
+      {showLoginPopup && !isLoggedIn && !isLoginPage && (
+        <Login isModal={true} onSuccess={handleLoginSuccess} />
+      )}
     </div>
   );
 }
