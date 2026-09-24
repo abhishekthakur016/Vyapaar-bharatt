@@ -80,26 +80,44 @@ function App() {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   // =========================
-  // SHOW LOGIN POPUP AFTER 5 SEC
+  // SHOW POPUP AFTER 5 SEC
+  // THEN AGAIN 20 SEC AFTER CLOSE
   // =========================
 
   useEffect(() => {
-    // If already logged in,
-    // make sure popup stays hidden.
+    // Don't show popup if user is already logged in
     if (isLoggedIn) {
       setShowLoginPopup(false);
       return;
     }
 
-    // Wait 5 seconds before showing popup.
+    // Show first popup after 5 seconds
     const timer = setTimeout(() => {
       setShowLoginPopup(true);
     }, 5000);
 
-    // Clear timer if component unmounts
-    // or isLoggedIn changes.
     return () => clearTimeout(timer);
   }, [isLoggedIn]);
+
+  // =========================
+  // CLOSE POPUP
+  // SHOW AGAIN AFTER 20 SEC
+  // =========================
+
+  const handleCloseLoginPopup = () => {
+    setShowLoginPopup(false);
+
+    // Show popup again after 20 seconds
+    setTimeout(() => {
+      const token = localStorage.getItem("vyapaar_token");
+      const user = localStorage.getItem("vyapaar_user");
+
+      // Only show again if user is still logged out
+      if (!token || !user) {
+        setShowLoginPopup(true);
+      }
+    }, 20000);
+  };
 
   // =========================
   // ADMIN ROUTE
@@ -120,10 +138,7 @@ function App() {
   const handleLoginSuccess = (user) => {
     console.log("Login successful:", user);
 
-    // User is now logged in.
     setIsLoggedIn(true);
-
-    // Close popup immediately.
     setShowLoginPopup(false);
   };
 
@@ -148,6 +163,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* =========================
           PUBLIC NAVBAR
       ========================== */}
@@ -159,6 +175,7 @@ function App() {
       ========================== */}
 
       <Routes>
+
         {/* HOME */}
 
         <Route path="/" element={<Home />} />
@@ -169,11 +186,20 @@ function App() {
 
         <Route path="/suppliers/:id" element={<SupplierDetails />} />
 
-        <Route path="/post-requirement" element={<PostRequirement />} />
+        <Route
+          path="/post-requirement"
+          element={<PostRequirement />}
+        />
 
-        <Route path="/requirements" element={<Requirements />} />
+        <Route
+          path="/requirements"
+          element={<Requirements />}
+        />
 
-        <Route path="/requirements/:id" element={<RequirementDetails />} />
+        <Route
+          path="/requirements/:id"
+          element={<RequirementDetails />}
+        />
 
         <Route
           path="/supplier/requirements"
@@ -182,62 +208,113 @@ function App() {
 
         <Route path="/products" element={<Products />} />
 
-        <Route path="/products/:id" element={<ProductDetails />} />
+        <Route
+          path="/products/:id"
+          element={<ProductDetails />}
+        />
 
-        <Route path="/supplier-rfqs" element={<SupplierRFQs />} />
+        <Route
+          path="/supplier-rfqs"
+          element={<SupplierRFQs />}
+        />
 
         {/* INSIGHTS */}
 
         <Route path="/insights" element={<Insights />} />
 
-        <Route path="/insights/:id" element={<InsightDetails />} />
+        <Route
+          path="/insights/:id"
+          element={<InsightDetails />}
+        />
 
-        {/* LOGIN PAGE */}
+        {/* LOGIN */}
 
         <Route path="/login" element={<Login />} />
 
         {/* USER PAGES */}
 
-        <Route path="/my-requirements" element={<MyRequirements />} />
+        <Route
+          path="/my-requirements"
+          element={<MyRequirements />}
+        />
 
-        <Route path="/my-quotes" element={<MyQuotes />} />
+        <Route
+          path="/my-quotes"
+          element={<MyQuotes />}
+        />
 
-        <Route path="/my-profile" element={<MyProfile />} />
+        <Route
+          path="/my-profile"
+          element={<MyProfile />}
+        />
 
         {/* =========================
             ADMIN ROUTES
         ========================== */}
 
         <Route
-          element={<ProtectedRoute allowedRoles={["admin", "super_admin"]} />}
+          element={
+            <ProtectedRoute
+              allowedRoles={["admin", "super_admin"]}
+            />
+          }
         >
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route
+            path="/admin/dashboard"
+            element={<AdminDashboard />}
+          />
 
-          <Route path="/admin/companies" element={<AdminCompanies />} />
+          <Route
+            path="/admin/companies"
+            element={<AdminCompanies />}
+          />
 
-          <Route path="/admin/companies/add" element={<AdminAddCompany />} />
+          <Route
+            path="/admin/companies/add"
+            element={<AdminAddCompany />}
+          />
 
-          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route
+            path="/admin/products"
+            element={<AdminProducts />}
+          />
 
-          <Route path="/admin/products/add" element={<AdminAddProduct />} />
+          <Route
+            path="/admin/products/add"
+            element={<AdminAddProduct />}
+          />
 
           <Route
             path="/admin/products/:id/edit"
             element={<AdminEditProduct />}
           />
 
-          <Route path="/admin/requirements" element={<AdminRequirements />} />
+          <Route
+            path="/admin/requirements"
+            element={<AdminRequirements />}
+          />
 
-          <Route path="/admin/insights" element={<InsightsAdmin />} />
+          <Route
+            path="/admin/insights"
+            element={<InsightsAdmin />}
+          />
         </Route>
 
         {/* =========================
             SUPPLIER ROUTES
         ========================== */}
 
-        <Route element={<ProtectedRoute allowedRoles={["supplier"]} />}>
-          <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={["supplier"]} />
+          }
+        >
+          <Route
+            path="/supplier/dashboard"
+            element={<SupplierDashboard />}
+          />
         </Route>
+
       </Routes>
 
       {/* =========================
@@ -247,13 +324,38 @@ function App() {
       {!isAdminRoute && <Footer />}
 
       {/* =========================
-          GLOBAL LOGIN POPUP
-          SHOW AFTER 5 SECONDS
+          LOGIN POPUP
       ========================== */}
 
       {showLoginPopup && !isLoggedIn && !isLoginPage && (
-        <Login isModal={true} onSuccess={handleLoginSuccess} />
+        <div className="relative">
+
+          {/* CROSS BUTTON */}
+
+          <button
+            onClick={handleCloseLoginPopup}
+            className="fixed top-4 right-4 z-[10001] 
+                       w-10 h-10 rounded-full 
+                       bg-white shadow-lg 
+                       flex items-center justify-center
+                       text-gray-700 text-2xl
+                       hover:bg-gray-100
+                       transition"
+            aria-label="Close login popup"
+          >
+            ×
+          </button>
+
+          {/* LOGIN POPUP */}
+
+          <Login
+            isModal={true}
+            onSuccess={handleLoginSuccess}
+          />
+
+        </div>
       )}
+
     </div>
   );
 }

@@ -1,337 +1,192 @@
-import {
-  Search,
-  ChevronDown,
-  ArrowRight,
-  Factory,
-  Globe2,
-  Truck,
-  Package,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, ChevronDown, ArrowRight, Globe2 } from "lucide-react";
 
-import heroTrade from "../assets/hero-trade.jpg";
-import tradeImage from "../assets/hero_section_vyapaarbharat.png";
+import arRoadline from "../assets/ar roadline.png";
+import quickTransport from "../assets/quick transport and solution.png";
+import ramanTempo from "../assets/raman tempo.png";
+import saiTyreHouse from "../assets/sai tyre hosue.png";
+import sonuMotorGarage from "../assets/sonu motor garage.png";
+import northIndiaHeavyTransport from "../assets/north india heavy transport.png";
 
 function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      image: arRoadline,
+      title: "AR Roadline",
+    },
+    {
+      image: quickTransport,
+      title: "Quick Transport and Solution",
+    },
+    {
+      image: ramanTempo,
+      title: "Raman Tempo Transport",
+    },
+    {
+      image: saiTyreHouse,
+      title: "Sai Tyre House",
+    },
+    {
+      image: sonuMotorGarage,
+      title: "Sonu Motor Garage",
+    },
+    {
+      image: northIndiaHeavyTransport,
+      title: "North India Heavy Transport",
+    },
+  ];
+
+  /* =========================
+     AUTO SLIDESHOW
+  ========================= */
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
   return (
-    <section className="relative overflow-hidden bg-white">
-      {/* Background Decoration */}
-      <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-[#0952d4]/5 blur-3xl" />
+    <section className="relative min-h-[700px] overflow-hidden sm:min-h-[750px] lg:min-h-[800px]">
+      {/* BACKGROUND SLIDES */}
 
-      <div className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-[#fd8836]/10 blur-3xl" />
+      {slides.map((slide, index) => (
+        <div
+          key={slide.image}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            currentSlide === index ? "z-0 opacity-100" : "z-0 opacity-0"
+          }`}
+        >
+          <img
+            src={slide.image}
+            alt={slide.title}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      ))}
 
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-        <div className="grid items-center gap-14 lg:grid-cols-2">
+      {/* DARK OVERLAY */}
 
-          {/* =====================================================
-              LEFT CONTENT
-          ===================================================== */}
-          <div>
-            {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#0952d4]/10 bg-[#0952d4]/5 px-4 py-2">
-              <span className="h-2 w-2 rounded-full bg-[#fd8836]" />
+      <div className="absolute inset-0 z-10 bg-black/5" />
 
-              <span className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
-                India's B2B Trade Network
-              </span>
-            </div>
+      {/* GRADIENT OVERLAY */}
 
-            {/* Hindi Headline */}
-            <h1 className="max-w-2xl text-5xl font-black leading-[1.05] tracking-tight text-[#0b1f3a] sm:text-6xl lg:text-7xl">
-              प्रचार करो
-              <br />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
 
-              <span className="text-[#0952d4]">
-                व्यापार करो.
-              </span>
-            </h1>
+      {/* HERO CONTENT */}
 
-            {/* English Headline */}
-            <p className="mt-5 text-2xl font-bold text-[#fd8836] sm:text-3xl">
-              Source Smarter. Grow Bigger.
-            </p>
+      <div className="relative z-20 mx-auto flex min-h-[700px] max-w-7xl items-center px-4 py-16 sm:min-h-[750px] sm:px-6 lg:min-h-[800px] lg:px-8">
+        <div className="w-full max-w-3xl">
+          {/* BADGE */}
 
-            {/* Description */}
-            <p className="mt-5 max-w-xl text-base leading-7 text-gray-600 sm:text-lg">
-              Connect with verified manufacturers, suppliers and businesses
-              across India and global markets. Discover products, compare
-              suppliers, request quotations and grow your business.
-            </p>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md">
+            <span className="h-2 w-2 rounded-full bg-[#fd8836]" />
 
-            {/* =====================================================
-                SEARCH BOX
-            ===================================================== */}
-            <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-2 shadow-[0_15px_50px_rgba(9,82,212,0.10)]">
-              <div className="flex flex-col gap-2 sm:flex-row">
+            <span className="text-xs font-bold uppercase tracking-wider text-white">
+              India's B2B Trade Network
+            </span>
+          </div>
 
-                {/* Search Input */}
-                <div className="flex flex-1 items-center gap-3 px-3">
-                  <Search
-                    size={21}
-                    className="shrink-0 text-gray-400"
-                  />
+          {/* HINDI HEADLINE */}
 
-                  <input
-                    type="text"
-                    placeholder="Search products, suppliers, categories..."
-                    className="w-full bg-transparent py-3 text-sm text-[#0b1f3a] outline-none placeholder:text-gray-400"
-                  />
-                </div>
+          <h1 className="text-5xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            प्रचार करो
+            <br />
+            <span className="text-[#fd8836]">व्यापार करो.</span>
+          </h1>
 
-                {/* Category */}
-                <button className="flex items-center justify-between gap-3 rounded-xl bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700 sm:min-w-[150px]">
-                  All Categories
+          {/* ENGLISH HEADLINE */}
 
-                  <ChevronDown size={16} />
-                </button>
+          <p className="mt-5 text-2xl font-bold text-white sm:text-3xl">
+            Source Smarter. Grow Bigger.
+          </p>
 
-                {/* Search Button */}
-                <button className="flex items-center justify-center gap-2 rounded-xl bg-[#0952d4] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0848ba]">
-                  Search
+          {/* DESCRIPTION */}
 
-                  <ArrowRight size={17} />
-                </button>
+          {/* <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
+            Connect with verified manufacturers, suppliers and businesses across
+            India and global markets. Discover products, compare suppliers,
+            request quotations and grow your business.
+          </p> */}
+
+          {/* SEARCH BOX */}
+
+          <div className="mt-8 max-w-3xl rounded-2xl border border-white/20 bg-white/95 p-2 shadow-2xl backdrop-blur-md">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="flex flex-1 items-center gap-3 px-3">
+                <Search size={21} className="shrink-0 text-gray-400" />
+
+                <input
+                  type="text"
+                  placeholder="Search products, suppliers, categories..."
+                  className="w-full bg-transparent py-3 text-sm text-[#0b1f3a] outline-none placeholder:text-gray-400"
+                />
               </div>
+
+              <button className="flex items-center justify-between gap-3 rounded-xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700 sm:min-w-[150px]">
+                All Categories
+                <ChevronDown size={16} />
+              </button>
+
+              <button className="flex items-center justify-center gap-2 rounded-xl bg-[#0952d4] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0848ba]">
+                Search
+                <ArrowRight size={17} />
+              </button>
             </div>
+          </div>
 
-            {/* =====================================================
-                SUGGESTED SEARCHES
-            ===================================================== */}
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-semibold text-gray-500">
-                Popular:
-              </span>
+          {/* POPULAR SEARCHES */}
 
-              {[
-                "Solar Panels",
-                "CNC Machine",
-                "Packaging",
-                "Steel Sheets",
-              ].map((item) => (
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-semibold text-white/80">Popular:</span>
+
+            {["Solar Panels", "CNC Machine", "Packaging", "Steel Sheets"].map(
+              (item) => (
                 <button
                   key={item}
-                  className="rounded-full bg-gray-100 px-3 py-1.5 font-medium text-gray-600 transition hover:bg-[#0952d4]/10 hover:text-[#0952d4]"
+                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 font-medium text-white backdrop-blur-sm transition hover:bg-white hover:text-[#0952d4]"
                 >
                   {item}
                 </button>
-              ))}
-            </div>
-
-            {/* =====================================================
-                CTA BUTTONS
-            ===================================================== */}
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <button className="flex items-center justify-center gap-2 rounded-xl bg-[#fd8836] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-                Post Your Requirement
-
-                <ArrowRight size={17} />
-              </button>
-
-              <button className="flex items-center justify-center gap-2 rounded-xl border border-[#0952d4] px-6 py-3.5 text-sm font-bold text-[#0952d4] transition hover:bg-[#0952d4] hover:text-white">
-                Explore Suppliers
-
-                <Globe2 size={17} />
-              </button>
-            </div>
+              ),
+            )}
           </div>
 
-          {/* =====================================================
-              RIGHT — TRADE VISUAL
-          ===================================================== */}
-          <div className="relative hidden min-h-[520px] lg:block">
+          {/* CTA BUTTONS */}
 
-            {/* =====================================================
-                MAIN OUTER CIRCLE — IMAGE
-            ===================================================== */}
-            <div className="absolute right-4 top-1/2 h-[440px] w-[440px] -translate-y-1/2 overflow-hidden rounded-full shadow-xl">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <button className="flex items-center justify-center gap-2 rounded-xl bg-[#fd8836] px-6 py-3.5 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-[#f47720] hover:shadow-xl">
+              Post Your Requirement
+              <ArrowRight size={17} />
+            </button>
 
-              <img
-                src={tradeImage}
-                alt="Vyapaar Bharat Global Trade"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-
-              {/* Very Light Overlay */}
-              <div className="absolute inset-0 bg-white/10" />
-            </div>
-
-            {/* =====================================================
-                INNER RING
-            ===================================================== */}
-            <div
-              className="
-                absolute
-                right-14
-                top-1/2
-                h-[350px]
-                w-[350px]
-                -translate-y-1/2
-                rounded-full
-                border
-                border-white/70
-              "
-            />
-
-            {/* =====================================================
-                MANUFACTURERS CARD
-            ===================================================== */}
-            <div
-              className="
-                absolute
-                right-[330px]
-                top-20
-                rounded-2xl
-                border
-                border-gray-200
-                bg-white
-                p-5
-                shadow-xl
-              "
-            >
-              <Factory
-                size={30}
-                className="text-[#0952d4]"
-              />
-
-              <p className="mt-2 text-sm font-bold text-[#0b1f3a]">
-                Manufacturers
-              </p>
-
-              <p className="text-xs text-gray-500">
-                Source Direct
-              </p>
-            </div>
-
-            {/* =====================================================
-                PRODUCTS CARD
-            ===================================================== */}
-            <div
-              className="
-                absolute
-                right-0
-                top-36
-                rounded-2xl
-                border
-                border-gray-200
-                bg-white
-                p-5
-                shadow-xl
-              "
-            >
-              <Package
-                size={30}
-                className="text-[#fd8836]"
-              />
-
-              <p className="mt-2 text-sm font-bold text-[#0b1f3a]">
-                Products
-              </p>
-
-              <p className="text-xs text-gray-500">
-                Millions Listed
-              </p>
-            </div>
-
-            {/* =====================================================
-                LOGISTICS CARD
-            ===================================================== */}
-            <div
-              className="
-                absolute
-                bottom-28
-                right-[320px]
-                rounded-2xl
-                border
-                border-gray-200
-                bg-white
-                p-5
-                shadow-xl
-              "
-            >
-              <Truck
-                size={30}
-                className="text-[#0952d4]"
-              />
-
-              <p className="mt-2 text-sm font-bold text-[#0b1f3a]">
-                Logistics
-              </p>
-
-              <p className="text-xs text-gray-500">
-                Move Business
-              </p>
-            </div>
-
-            {/* =====================================================
-                GLOBAL CONNECTION CARD
-            ===================================================== */}
-            <div
-              className="
-                absolute
-                bottom-12
-                right-8
-                rounded-2xl
-                bg-[#fd8836]
-                px-6
-                py-4
-                shadow-xl
-              "
-            >
-              <p className="text-xs font-semibold text-white/80">
-                CONNECTING
-              </p>
-
-              <p className="text-lg font-black text-white">
-                India → Global
-              </p>
-            </div>
-
-            {/* =====================================================
-                CONNECTION DOTS
-            ===================================================== */}
-
-            {/* Orange Dot */}
-            <div
-              className="
-                absolute
-                right-[135px]
-                top-[105px]
-                h-3
-                w-3
-                animate-pulse
-                rounded-full
-                bg-[#fd8836]
-              "
-            />
-
-            {/* Blue Dot */}
-            <div
-              className="
-                absolute
-                right-[390px]
-                top-[260px]
-                h-3
-                w-3
-                animate-pulse
-                rounded-full
-                bg-[#0952d4]
-              "
-            />
-
-            {/* Orange Dot */}
-            <div
-              className="
-                absolute
-                bottom-[110px]
-                right-[270px]
-                h-3
-                w-3
-                animate-pulse
-                rounded-full
-                bg-[#fd8836]
-              "
-            />
+            <button className="flex items-center justify-center gap-2 rounded-xl border border-white/60 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white hover:text-[#0952d4]">
+              Explore Suppliers
+              <Globe2 size={17} />
+            </button>
           </div>
         </div>
+      </div>
+
+      {/* SLIDE INDICATORS */}
+
+      <div className="absolute bottom-8 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
+            className={`h-2 rounded-full transition-all duration-500 ${
+              currentSlide === index
+                ? "w-8 bg-[#fd8836]"
+                : "w-2 bg-white/60 hover:bg-white"
+            }`}
+          />
+        ))}
       </div>
     </section>
   );
