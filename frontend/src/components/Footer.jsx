@@ -178,7 +178,7 @@ function Footer() {
                   </p>
 
                   <p className="mt-1 text-sm font-medium text-gray-700">
-                    support@vyapaarbharat.com
+                    info@vyapaarbharat.com
                   </p>
                 </div>
               </div>

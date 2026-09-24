@@ -177,15 +177,15 @@ function Hero() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#fd8836] shadow-[0_0_0_5px_rgba(253,136,54,0.10)]" />
 
               <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#0b1f3a]">
-                India's B2B Trade Network
+                India's B2B & B2C Trade Network
               </span>
             </div>
 
             {/* Hindi Heading */}
             <h1 className="max-w-[600px] text-[48px] font-black leading-[0.98] tracking-[-0.035em] text-[#071a40] sm:text-[58px] lg:text-[62px] xl:text-[70px]">
-              प्रचार करो
+             Trade Across
               <br />
-              <span className="text-[#fd641c]">व्यापार करो.</span>
+              <span className="text-[#fd641c]">India.</span>
             </h1>
 
             {/* English Heading */}
