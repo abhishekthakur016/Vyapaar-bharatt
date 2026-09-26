@@ -6,22 +6,40 @@ function Categories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL;
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${API_URL}/categories`);
+        const [productsResponse, suppliersResponse] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/suppliers"),
+        ]);
 
-        if (!response.ok) {
+        if (!productsResponse.ok || !suppliersResponse.ok) {
           throw new Error("Failed to fetch categories");
         }
 
-        const data = await response.json();
+        const productsData = await productsResponse.json();
+        const suppliersData = await suppliersResponse.json();
 
-        setCategories(data);
+        // Categories from products
+        const productCategories = (productsData.products || [])
+          .map((product) => product.category)
+          .filter(Boolean);
+
+        // Categories from suppliers
+        const supplierCategories = (suppliersData.suppliers || [])
+          .map((supplier) => supplier.industry)
+          .filter(Boolean);
+
+        // Combine both and remove duplicates
+        const allCategories = [
+          ...new Set([...productCategories, ...supplierCategories]),
+        ].sort((a, b) => a.localeCompare(b));
+
+        setCategories(allCategories);
       } catch (error) {
         console.error("Error fetching categories:", error);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -50,7 +68,10 @@ function Categories() {
             </p>
           </div>
 
-          <button className="group flex items-center gap-2 self-start rounded-xl border border-[#0952d4] px-5 py-3 text-sm font-bold text-[#0952d4] transition hover:bg-[#0952d4] hover:text-white sm:self-auto">
+          <button
+            type="button"
+            className="group flex items-center gap-2 self-start rounded-xl border border-[#0952d4] px-5 py-3 text-sm font-bold text-[#0952d4] transition hover:bg-[#0952d4] hover:text-white sm:self-auto"
+          >
             View All Categories
             <ArrowRight
               size={17}
@@ -78,7 +99,13 @@ function Categories() {
         ) : (
           <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {categories.map((category) => (
-              <CategoryCard key={category.id} category={category} />
+              <CategoryCard
+                key={category}
+                category={{
+                  id: category,
+                  name: category,
+                }}
+              />
             ))}
           </div>
         )}
