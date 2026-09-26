@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+
+import { Link, useSearchParams } from "react-router-dom";
+
 import {
   Search,
   MapPin,
@@ -8,30 +10,51 @@ import {
   ArrowRight,
   SlidersHorizontal,
   ChevronDown,
-  LoaderCircle,
-  Truck,
   X,
 } from "lucide-react";
 
 export default function Products() {
+  /*
+  ==================================================
+  STATE
+  ==================================================
+  */
+
   const [products, setProducts] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
+
   const [category, setCategory] = useState("All Categories");
+
   const [supplier, setSupplier] = useState("All Suppliers");
+
   const [availability, setAvailability] = useState("All Availability");
+
   const [showFilters, setShowFilters] = useState(false);
 
-  // =========================
-  // FETCH PRODUCTS
-  // =========================
+  /*
+  ==================================================
+  URL SEARCH PARAMS
+  ==================================================
+  */
+
+  const [searchParams] = useSearchParams();
+
+  /*
+  ==================================================
+  FETCH PRODUCTS
+  ==================================================
+  */
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
+
         setError("");
 
         const response = await fetch("/api/products");
@@ -59,48 +82,100 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  // =========================
-  // DYNAMIC CATEGORIES
-  // =========================
+  /*
+  ==================================================
+  READ CATEGORY FROM URL
+  ==================================================
+
+  Example:
+
+  /products?category=Transportation
+
+  */
+
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get("category");
+
+    if (categoryFromUrl) {
+      setCategory(categoryFromUrl);
+    } else {
+      setCategory("All Categories");
+    }
+  }, [searchParams]);
+
+  /*
+  ==================================================
+  DYNAMIC CATEGORIES
+  ==================================================
+  */
 
   const categories = useMemo(() => {
-    const values = products.map((product) => product.category).filter(Boolean);
+    const values = products
+      .map((product) => product?.category)
+      .filter(Boolean)
+      .map((category) => String(category).trim());
 
-    return ["All Categories", ...new Set(values)];
+    const uniqueCategories = [...new Set(values)].sort((a, b) =>
+      a.localeCompare(b),
+    );
+
+    return ["All Categories", ...uniqueCategories];
   }, [products]);
 
-  // =========================
-  // DYNAMIC SUPPLIERS
-  // =========================
+  /*
+  ==================================================
+  DYNAMIC SUPPLIERS
+  ==================================================
+  */
 
   const suppliers = useMemo(() => {
     const values = products
-      .map((product) => product.supplier_name)
-      .filter(Boolean);
+      .map((product) => product?.supplier_name)
+      .filter(Boolean)
+      .map((supplierName) => String(supplierName).trim());
 
-    return ["All Suppliers", ...new Set(values)];
+    const uniqueSuppliers = [...new Set(values)].sort((a, b) =>
+      a.localeCompare(b),
+    );
+
+    return ["All Suppliers", ...uniqueSuppliers];
   }, [products]);
 
-  // =========================
-  // DYNAMIC AVAILABILITY
-  // =========================
+  /*
+  ==================================================
+  DYNAMIC AVAILABILITY
+  ==================================================
+  */
 
   const availabilityOptions = useMemo(() => {
     const values = products
-      .map((product) => product.availability)
-      .filter(Boolean);
+      .map((product) => product?.availability)
+      .filter(Boolean)
+      .map((availability) => String(availability).trim());
 
-    return ["All Availability", ...new Set(values)];
+    const uniqueAvailability = [...new Set(values)].sort((a, b) =>
+      a.localeCompare(b),
+    );
+
+    return ["All Availability", ...uniqueAvailability];
   }, [products]);
 
-  // =========================
-  // FILTER PRODUCTS
-  // =========================
+  /*
+  ==================================================
+  FILTER PRODUCTS
+  ==================================================
+  */
 
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return products.filter((product) => {
+      /*
+      ----------------------------------------------
+      SEARCH
+      ----------------------------------------------
+      */
+
       const matchesSearch =
         !query ||
         product.name?.toLowerCase().includes(query) ||
@@ -109,11 +184,30 @@ export default function Products() {
         product.description?.toLowerCase().includes(query) ||
         product.supplier_name?.toLowerCase().includes(query);
 
+      /*
+      ----------------------------------------------
+      CATEGORY
+      ----------------------------------------------
+      */
+
       const matchesCategory =
-        category === "All Categories" || product.category === category;
+        category === "All Categories" ||
+        product.category?.trim() === category.trim();
+
+      /*
+      ----------------------------------------------
+      SUPPLIER
+      ----------------------------------------------
+      */
 
       const matchesSupplier =
         supplier === "All Suppliers" || product.supplier_name === supplier;
+
+      /*
+      ----------------------------------------------
+      AVAILABILITY
+      ----------------------------------------------
+      */
 
       const matchesAvailability =
         availability === "All Availability" ||
@@ -128,56 +222,80 @@ export default function Products() {
     });
   }, [products, search, category, supplier, availability]);
 
-  // =========================
-  // CLEAR FILTERS
-  // =========================
+  /*
+  ==================================================
+  CLEAR FILTERS
+  ==================================================
+  */
 
   const clearFilters = () => {
     setSearch("");
+
     setCategory("All Categories");
+
     setSupplier("All Suppliers");
+
     setAvailability("All Availability");
   };
 
-  // =========================
-  // FORMAT PRICE
-  // =========================
+  /*
+  ==================================================
+  FORMAT PRICE
+  ==================================================
+  */
 
   const formatPrice = (price) => {
-    if (!price) {
+    if (
+      price === null ||
+      price === undefined ||
+      price === "" ||
+      Number(price) === 0
+    ) {
       return "Price on Request";
     }
 
     return `₹${Number(price).toLocaleString("en-IN")}`;
   };
 
-  // =========================
-  // FORMAT MOQ
-  // =========================
+  /*
+  ==================================================
+  FORMAT MOQ
+  ==================================================
+  */
 
   const formatMOQ = (product) => {
-    if (!product.moq) {
+    if (!product?.moq) {
       return "MOQ on Request";
     }
 
-    return `${Number(product.moq).toLocaleString(
-      "en-IN",
-    )} ${product.moq_unit || ""}`.trim();
+    return `${Number(product.moq).toLocaleString("en-IN")} ${
+      product.moq_unit || ""
+    }`.trim();
   };
+
+  /*
+  ==================================================
+  RENDER
+  ==================================================
+  */
 
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* =========================
+      {/* ==========================================
           HERO
-      ========================= */}
+      ========================================== */}
 
       <section className="bg-[#0952d4]">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
           <div className="mx-auto max-w-3xl text-center">
+            {/* BADGE */}
+
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white">
               <Package size={15} />
               B2B Products Marketplace
             </div>
+
+            {/* HEADING */}
 
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
               Discover Products
@@ -185,6 +303,8 @@ export default function Products() {
                 From Trusted Suppliers
               </span>
             </h1>
+
+            {/* DESCRIPTION */}
 
             <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-blue-100 sm:text-lg">
               Explore products from manufacturers, suppliers and businesses
@@ -206,7 +326,7 @@ export default function Products() {
               </div>
 
               <button
-                onClick={() => {}}
+                type="button"
                 className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 py-3 font-bold text-white transition hover:bg-orange-600"
               >
                 Search
@@ -217,9 +337,9 @@ export default function Products() {
         </div>
       </section>
 
-      {/* =========================
+      {/* ==========================================
           CONTENT
-      ========================= */}
+      ========================================== */}
 
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* TOP BAR */}
@@ -239,6 +359,7 @@ export default function Products() {
             {/* MOBILE FILTER BUTTON */}
 
             <button
+              type="button"
               onClick={() => setShowFilters(!showFilters)}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 lg:hidden"
             >
@@ -248,10 +369,12 @@ export default function Products() {
           </div>
         </div>
 
+        {/* MAIN LAYOUT */}
+
         <div className="flex flex-col gap-6 lg:flex-row">
-          {/* =========================
+          {/* ======================================
               FILTER SIDEBAR
-          ========================= */}
+          ====================================== */}
 
           <aside
             className={`w-full shrink-0 lg:block lg:w-64 ${
@@ -259,10 +382,13 @@ export default function Products() {
             }`}
           >
             <div className="rounded-2xl border border-slate-200 bg-white p-5 lg:sticky lg:top-24">
+              {/* FILTER HEADER */}
+
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="font-bold text-[#0b1f3a]">Filters</h3>
 
                 <button
+                  type="button"
                   onClick={clearFilters}
                   className="text-xs font-semibold text-blue-600 hover:text-blue-800"
                 >
@@ -368,9 +494,9 @@ export default function Products() {
             </div>
           </aside>
 
-          {/* =========================
-              PRODUCTS
-          ========================= */}
+          {/* ======================================
+              PRODUCTS AREA
+          ====================================== */}
 
           <div className="min-w-0 flex-1">
             {/* ACTIVE FILTERS */}
@@ -384,8 +510,11 @@ export default function Products() {
                   Active filters:
                 </span>
 
+                {/* SEARCH */}
+
                 {search && (
                   <button
+                    type="button"
                     onClick={() => setSearch("")}
                     className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
                   >
@@ -394,32 +523,44 @@ export default function Products() {
                   </button>
                 )}
 
+                {/* CATEGORY */}
+
                 {category !== "All Categories" && (
                   <button
+                    type="button"
                     onClick={() => setCategory("All Categories")}
                     className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
                   >
                     {category}
+
                     <X size={12} />
                   </button>
                 )}
 
+                {/* SUPPLIER */}
+
                 {supplier !== "All Suppliers" && (
                   <button
+                    type="button"
                     onClick={() => setSupplier("All Suppliers")}
                     className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
                   >
                     {supplier}
+
                     <X size={12} />
                   </button>
                 )}
 
+                {/* AVAILABILITY */}
+
                 {availability !== "All Availability" && (
                   <button
+                    type="button"
                     onClick={() => setAvailability("All Availability")}
                     className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
                   >
                     {availability}
+
                     <X size={12} />
                   </button>
                 )}
@@ -433,6 +574,7 @@ export default function Products() {
                 <p className="text-sm font-semibold text-red-600">{error}</p>
 
                 <button
+                  type="button"
                   onClick={() => window.location.reload()}
                   className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white"
                 >
@@ -461,6 +603,10 @@ export default function Products() {
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
+              /* ====================================
+                 PRODUCT GRID
+              ==================================== */
+
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredProducts.map((product) => (
                   <div
@@ -473,7 +619,7 @@ export default function Products() {
                       {product.image_url ? (
                         <img
                           src={product.image_url}
-                          alt={product.name}
+                          alt={product.name || "Product"}
                           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />
                       ) : (
@@ -484,6 +630,8 @@ export default function Products() {
                         />
                       )}
                     </div>
+
+                    {/* PRODUCT CONTENT */}
 
                     <div className="p-5">
                       {/* CATEGORY */}
@@ -504,7 +652,7 @@ export default function Products() {
                       {/* NAME */}
 
                       <h3 className="mt-4 line-clamp-2 text-lg font-bold text-[#0b1f3a]">
-                        {product.name}
+                        {product.name || "Unnamed Product"}
                       </h3>
 
                       {/* DESCRIPTION */}
@@ -523,7 +671,7 @@ export default function Products() {
                             .slice(0, 2)
                             .map((word) => word[0])
                             .join("")
-                            .toUpperCase()}
+                            .toUpperCase() || "SU"}
                         </div>
 
                         <div className="min-w-0">
@@ -539,7 +687,7 @@ export default function Products() {
                         </div>
                       </div>
 
-                      {/* MOQ */}
+                      {/* MOQ + AVAILABILITY */}
 
                       <div className="mt-4 grid grid-cols-2 gap-2">
                         <div className="rounded-xl bg-slate-50 p-3">
@@ -581,7 +729,7 @@ export default function Products() {
                         </p>
                       </div>
 
-                      {/* BUTTON */}
+                      {/* VIEW PRODUCT */}
 
                       <Link
                         to={`/products/${product.id}`}
@@ -595,7 +743,9 @@ export default function Products() {
                 ))}
               </div>
             ) : (
-              /* NO PRODUCTS */
+              /* ====================================
+                 NO PRODUCTS
+              ==================================== */
 
               <div className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
@@ -611,6 +761,7 @@ export default function Products() {
                 </p>
 
                 <button
+                  type="button"
                   onClick={clearFilters}
                   className="mt-5 rounded-xl bg-[#0952d4] px-5 py-2.5 text-sm font-semibold text-white"
                 >
@@ -625,9 +776,11 @@ export default function Products() {
   );
 }
 
-/* =========================
-   SMALL ICON COMPONENT
-========================= */
+/*
+==================================================
+SMALL ICON COMPONENT
+==================================================
+*/
 
 function ShieldIcon() {
   return (
