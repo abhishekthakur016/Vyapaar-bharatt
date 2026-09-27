@@ -30,7 +30,52 @@ function FeaturedSuppliers() {
           throw new Error("Supplier API returned an error");
         }
 
-        setSuppliers(data.suppliers || []);
+        const realSuppliers = data.suppliers || [];
+
+        // ==========================================
+        // NORMALIZE DATABASE DATA
+        // ==========================================
+
+        const formattedSuppliers = realSuppliers.map((supplier) => {
+          const image =
+            supplier.image_url ||
+            supplier.logo_url ||
+            supplier.logo ||
+            supplier.image ||
+            "";
+
+          return {
+            ...supplier,
+
+            // Main database image
+            image_url: image,
+
+            // Compatibility with SupplierCard
+            image: image,
+            logo: image,
+            logo_url: image,
+
+            // Real supplier fields
+            reviews: supplier.reviews || 0,
+            rating: supplier.rating || 0,
+            products: supplier.products || supplier.product_count || 0,
+
+            // Experience
+            experience:
+              supplier.experience || supplier.years_of_experience || 0,
+
+            // Location
+            location: supplier.location || "India",
+
+            // Industry
+            industry: supplier.industry || "B2B Supplier",
+
+            // Verification
+            verified: Boolean(supplier.verified),
+          };
+        });
+
+        setSuppliers(formattedSuppliers);
       } catch (err) {
         console.error("Featured suppliers error:", err);
         setError("Unable to load suppliers.");
@@ -43,7 +88,7 @@ function FeaturedSuppliers() {
   }, []);
 
   // ==========================================
-  // SHOW ONLY FEATURED SUPPLIERS
+  // SHOW ONLY FIRST 6 SUPPLIERS
   // ==========================================
 
   const featuredSuppliers = suppliers.slice(0, 6);
@@ -72,6 +117,7 @@ function FeaturedSuppliers() {
           </div>
 
           {/* Supplier Directory */}
+
           <Link
             to="/suppliers"
             className="group flex items-center gap-2 self-start rounded-xl border border-[#0952d4] px-5 py-3 text-sm font-bold text-[#0952d4] transition hover:bg-[#0952d4] hover:text-white sm:self-auto"
@@ -100,6 +146,7 @@ function FeaturedSuppliers() {
 
                   <div className="flex-1">
                     <div className="h-5 w-3/4 rounded bg-slate-200" />
+
                     <div className="mt-3 h-4 w-1/2 rounded bg-slate-200" />
                   </div>
                 </div>
