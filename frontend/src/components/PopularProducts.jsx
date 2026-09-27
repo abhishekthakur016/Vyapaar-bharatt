@@ -11,7 +11,7 @@ function PopularProducts() {
   const [error, setError] = useState("");
 
   // ==========================================
-  // FETCH PRODUCTS + CATEGORIES
+  // FETCH REAL PRODUCTS + CATEGORIES
   // ==========================================
 
   useEffect(() => {
@@ -47,16 +47,41 @@ function PopularProducts() {
         const realProducts = productsData.products || [];
         const realSuppliers = suppliersData.suppliers || [];
 
-        setProducts(realProducts);
+        // ==========================================
+        // NORMALIZE PRODUCT DATA
+        // ==========================================
+
+        const formattedProducts = realProducts.map((product) => {
+          const imageUrl =
+            product.image_url ||
+            product.imageUrl ||
+            product.image ||
+            product.product_image ||
+            "";
+
+          return {
+            ...product,
+
+            // Main real database image
+            image_url: imageUrl,
+
+            // Compatibility for ProductCard
+            image: imageUrl,
+            imageUrl: imageUrl,
+            product_image: imageUrl,
+          };
+        });
+
+        setProducts(formattedProducts);
 
         // ==========================================
-        // BUILD SAME CATEGORIES AS CATEGORIES.JSX
+        // BUILD REAL CATEGORIES
         // ==========================================
 
         const categoryMap = new Map();
 
-        // Product categories
-        realProducts.forEach((product) => {
+        // Categories from products
+        formattedProducts.forEach((product) => {
           const categoryName = product?.category?.trim();
 
           if (!categoryName) return;
@@ -73,7 +98,7 @@ function PopularProducts() {
           categoryMap.get(key).products += 1;
         });
 
-        // Supplier industries
+        // Categories from supplier industries
         realSuppliers.forEach((supplier) => {
           const categoryName = supplier?.industry?.trim();
 
@@ -121,7 +146,10 @@ function PopularProducts() {
     );
   }, [products, activeTab]);
 
-  // Show maximum 8 products
+  // ==========================================
+  // SHOW MAXIMUM 8 PRODUCTS
+  // ==========================================
+
   const displayedProducts = filteredProducts.slice(0, 8);
 
   return (
@@ -131,7 +159,7 @@ function PopularProducts() {
             CATEGORIES
         ========================================== */}
 
-        <div className="mb-10 flex gap-2 overflow-x-auto pb-2">
+        <div className="mb-10 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {categories.map((category) => {
             const isActive = activeTab === category;
 
@@ -206,7 +234,7 @@ function PopularProducts() {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="mt-4 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-700"
+              className="mt-4 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-red-700"
             >
               Retry
             </button>
@@ -255,7 +283,7 @@ function PopularProducts() {
               <button
                 type="button"
                 onClick={() => setActiveTab("All")}
-                className="mt-5 rounded-xl bg-[#0952d4] px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                className="mt-5 rounded-xl bg-[#0952d4] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 View All Products
               </button>
