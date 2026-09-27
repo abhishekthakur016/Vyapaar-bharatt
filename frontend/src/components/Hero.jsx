@@ -286,7 +286,7 @@ function Hero() {
             <div className="absolute -inset-5 rounded-[34px] bg-[#0952d4]/10 blur-2xl" />
 
             {/* Main Slider */}
-            <div className="relative overflow-hidden rounded-[24px] border border-white/90 bg-white/80 p-2 shadow-[0_25px_70px_rgba(8,53,110,0.25)] backdrop-blur-md">
+            <div className="relative w-full overflow-hidden rounded-[24px] border border-white/90 bg-white/80 p-1.5 shadow-[0_25px_70px_rgba(8,53,110,0.25)] backdrop-blur-md sm:p-2">
               {/* =================================================
                   SLIDESHOW IMAGE
 
@@ -295,7 +295,7 @@ function Hero() {
                   DESKTOP = 16/8.2
               ================================================= */}
 
-              <div className="relative aspect-[16/10] overflow-hidden rounded-[18px] bg-[#eaf3fb] sm:aspect-[16/9] lg:aspect-[16/8.2]">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[16px] bg-[#eaf3fb] sm:aspect-[16/9] lg:aspect-[16/8.2]">
                 {/* Slides */}
                 {slides.map((slide, index) => (
                   <div
