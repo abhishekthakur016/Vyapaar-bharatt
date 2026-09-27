@@ -43,12 +43,16 @@ import MyProfile from "./pages/MyProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierDashboard from "./pages/SupplierDashboard";
+import ImageCarousel from "./components/ImageCarousel"
+
+
 
 function Home() {
   return (
     <main>
       <Hero />
       <Stats />
+      <ImageCarousel />
       <Categories />
       <PopularProducts />
       <FeaturedSuppliers />
