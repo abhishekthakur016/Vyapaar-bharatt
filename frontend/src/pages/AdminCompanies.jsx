@@ -24,6 +24,7 @@ import {
   XCircle,
   Plus,
   Trash2,
+  Pencil,
 } from "lucide-react";
 
 function AdminCompanies() {
@@ -37,6 +38,10 @@ function AdminCompanies() {
   const [error, setError] = useState("");
 
   const user = JSON.parse(localStorage.getItem("vyapaar_user") || "{}");
+
+  // ==================================================
+  // FETCH COMPANIES
+  // ==================================================
 
   const fetchCompanies = async () => {
     try {
@@ -61,9 +66,17 @@ function AdminCompanies() {
     }
   };
 
+  // ==================================================
+  // LOAD ON PAGE
+  // ==================================================
+
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  // ==================================================
+  // SEARCH
+  // ==================================================
 
   const filteredCompanies = companies.filter((company) => {
     const searchText = search.toLowerCase();
@@ -76,6 +89,10 @@ function AdminCompanies() {
     );
   });
 
+  // ==================================================
+  // DELETE COMPANY
+  // ==================================================
+
   const handleDeleteCompany = async (company) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${company.name}"?`,
@@ -86,15 +103,12 @@ function AdminCompanies() {
     try {
       const token = localStorage.getItem("vyapaar_token");
 
-      const response = await fetch(
-        `/api/admin/suppliers/${company.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`/api/admin/suppliers/${company.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
 
@@ -107,16 +121,26 @@ function AdminCompanies() {
       alert("Company deleted successfully.");
     } catch (error) {
       console.error("Delete company error:", error);
+
       alert(error.message || "Unable to delete company");
     }
   };
 
+  // ==================================================
+  // LOGOUT
+  // ==================================================
+
   const handleLogout = () => {
     localStorage.removeItem("vyapaar_token");
+
     localStorage.removeItem("vyapaar_user");
 
     navigate("/login");
   };
+
+  // ==================================================
+  // SIDEBAR MENU
+  // ==================================================
 
   const menuItems = [
     {
@@ -171,6 +195,10 @@ function AdminCompanies() {
       path: "/admin/settings",
     },
   ];
+
+  // ==================================================
+  // UI
+  // ==================================================
 
   return (
     <div className="min-h-screen bg-[#f5f7fb]">
@@ -460,7 +488,7 @@ function AdminCompanies() {
 
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[900px]">
+                <table className="w-full min-w-[1050px]">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50 text-left">
                       <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
@@ -559,13 +587,27 @@ function AdminCompanies() {
                         {/* Action */}
 
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            {/* VIEW */}
+
                             <Link
                               to={`/admin/companies/${company.id}`}
-                              className="text-sm font-bold text-[#0952d4] transition hover:text-blue-700 hover:underline"
+                              className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-[#0952d4] transition hover:border-blue-200 hover:bg-blue-50"
                             >
                               View
                             </Link>
+
+                            {/* EDIT */}
+
+                            <Link
+                              to={`/admin/companies/${company.id}/edit`}
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-[#0952d4] px-3 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
+                            >
+                              <Pencil size={14} />
+                              Edit
+                            </Link>
+
+                            {/* DELETE */}
 
                             <button
                               type="button"

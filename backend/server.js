@@ -1981,6 +1981,185 @@ app.post("/api/suppliers", async (req, res) => {
       ? galleryImages.filter(Boolean)
       : [];
 
+
+    // ==================================================
+// UPDATE COMPANY / SUPPLIER
+// ==================================================
+
+app.put(
+  "/api/admin/suppliers/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // ===============================
+      // ADMIN CHECK
+      // ===============================
+
+      if (
+        !["admin", "super_admin"].includes(
+          req.user.role
+        )
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "Admin access required",
+        });
+      }
+
+      // ===============================
+      // REQUEST DATA
+      // ===============================
+
+      const {
+        name,
+        businessType,
+        industry,
+        location,
+        address,
+        description,
+        phone,
+        email,
+        yearsInBusiness,
+        verified,
+        services,
+        serviceAreas,
+        imageUrl,
+        galleryImages,
+      } = req.body;
+
+      // ===============================
+      // VALIDATION
+      // ===============================
+
+      if (!name || !name.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Company name is required",
+        });
+      }
+
+      // ===============================
+      // SERVICES
+      // ===============================
+
+      const servicesArray = Array.isArray(
+        services
+      )
+        ? services.filter(Boolean)
+        : services
+          ? services
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean)
+          : [];
+
+      // ===============================
+      // SERVICE AREAS
+      // ===============================
+
+      const serviceAreasArray =
+        Array.isArray(serviceAreas)
+          ? serviceAreas.filter(Boolean)
+          : serviceAreas
+            ? serviceAreas
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean)
+            : [];
+
+      // ===============================
+      // GALLERY
+      // ===============================
+
+      const galleryImagesArray =
+        Array.isArray(galleryImages)
+          ? galleryImages.filter(Boolean)
+          : [];
+
+      // ===============================
+      // UPDATE
+      // ===============================
+
+      const result = await pool.query(
+        `
+        UPDATE suppliers
+        SET
+          name = $1,
+          business_type = $2,
+          industry = $3,
+          location = $4,
+          address = $5,
+          description = $6,
+          phone = $7,
+          email = $8,
+          years_in_business = $9,
+          verified = $10,
+          services = $11,
+          service_areas = $12,
+          image_url = $13,
+          gallery_images = $14,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $15
+        RETURNING *
+        `,
+        [
+          name.trim(),
+          businessType || null,
+          industry || null,
+          location || null,
+          address || null,
+          description || null,
+          phone || null,
+          email || null,
+          yearsInBusiness !== ""
+            ? Number(yearsInBusiness)
+            : null,
+          Boolean(verified),
+          servicesArray,
+          serviceAreasArray,
+          imageUrl || null,
+          galleryImagesArray,
+          id,
+        ]
+      );
+
+      // ===============================
+      // COMPANY NOT FOUND
+      // ===============================
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Company not found",
+        });
+      }
+
+      // ===============================
+      // SUCCESS
+      // ===============================
+
+      return res.json({
+        success: true,
+        message:
+          "Company updated successfully",
+        company: result.rows[0],
+      });
+    } catch (error) {
+      console.error(
+        "Update supplier error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update company",
+      });
+    }
+  }
+);  
+
     // ===============================
     // Create company
     // ===============================

@@ -44,6 +44,7 @@ import MyProfile from "./pages/MyProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierDashboard from "./pages/SupplierDashboard";
 import ImageCarousel from "./components/ImageCarousel"
+import AdminEditCompany from "./pages/AdminEditCompany";
 
 
 
@@ -318,6 +319,11 @@ function App() {
             element={<SupplierDashboard />}
           />
         </Route>
+
+        <Route
+  path="/admin/companies/:id/edit"
+  element={<AdminEditCompany />}
+/>
 
       </Routes>
 
