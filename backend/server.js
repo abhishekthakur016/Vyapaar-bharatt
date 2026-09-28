@@ -9,14 +9,11 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-
 const app = express();
 const authenticateToken = require("./middleware/authMiddleware");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID
-);
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ===============================
 // Middleware
@@ -361,7 +358,7 @@ app.post("/api/auth/google", async (req, res) => {
       FROM users
       WHERE google_id = $1
       `,
-      [googleId]
+      [googleId],
     );
 
     // ==========================================
@@ -386,7 +383,7 @@ app.post("/api/auth/google", async (req, res) => {
           updated_at = CURRENT_TIMESTAMP
         WHERE id = $1
         `,
-        [user.id]
+        [user.id],
       );
 
       const token = jwt.sign(
@@ -397,7 +394,7 @@ app.post("/api/auth/google", async (req, res) => {
         process.env.JWT_SECRET,
         {
           expiresIn: "7d",
-        }
+        },
       );
 
       return res.json({
@@ -434,7 +431,7 @@ app.post("/api/auth/google", async (req, res) => {
       FROM users
       WHERE LOWER(email) = LOWER($1)
       `,
-      [email]
+      [email],
     );
 
     // ==========================================
@@ -470,7 +467,7 @@ app.post("/api/auth/google", async (req, res) => {
           is_active,
           is_verified
         `,
-        [googleId, user.id]
+        [googleId, user.id],
       );
 
       const updatedUser = updatedResult.rows[0];
@@ -483,7 +480,7 @@ app.post("/api/auth/google", async (req, res) => {
         process.env.JWT_SECRET,
         {
           expiresIn: "7d",
-        }
+        },
       );
 
       return res.json({
@@ -544,11 +541,7 @@ app.post("/api/auth/google", async (req, res) => {
         is_active,
         is_verified
       `,
-      [
-        name || email.split("@")[0],
-        email,
-        googleId,
-      ]
+      [name || email.split("@")[0], email, googleId],
     );
 
     const newUser = newUserResult.rows[0];
@@ -565,7 +558,7 @@ app.post("/api/auth/google", async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      }
+      },
     );
 
     return res.status(201).json({
@@ -583,7 +576,6 @@ app.post("/api/auth/google", async (req, res) => {
         isVerified: newUser.is_verified,
       },
     });
-
   } catch (error) {
     console.error("Google login error:", error);
 
@@ -598,33 +590,27 @@ app.post("/api/auth/google", async (req, res) => {
 // Select Buyer / Supplier Role
 // ===============================
 
-app.post(
-  "/api/auth/select-role",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const { role } = req.body;
+app.post("/api/auth/select-role", authenticateToken, async (req, res) => {
+  try {
+    const { role } = req.body;
 
-      if (!["buyer", "supplier"].includes(role)) {
-        return res.status(400).json({
-          success: false,
-          message: "Please select buyer or supplier",
-        });
-      }
+    if (!["buyer", "supplier"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select buyer or supplier",
+      });
+    }
 
-      // Admin roles cannot use role selection
-      if (
-        req.user.role === "admin" ||
-        req.user.role === "super_admin"
-      ) {
-        return res.status(403).json({
-          success: false,
-          message: "Admin roles cannot be changed here",
-        });
-      }
+    // Admin roles cannot use role selection
+    if (req.user.role === "admin" || req.user.role === "super_admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin roles cannot be changed here",
+      });
+    }
 
-      const result = await pool.query(
-        `
+    const result = await pool.query(
+      `
         UPDATE users
         SET
           role = $1,
@@ -639,68 +625,63 @@ app.post(
           is_active,
           is_verified
         `,
-        [role, req.user.id]
-      );
+      [role, req.user.id],
+    );
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
-
-      const user = result.rows[0];
-
-      // Generate new JWT with selected role
-      const token = jwt.sign(
-        {
-          userId: user.id,
-          role: user.role,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "7d",
-        }
-      );
-
-      return res.json({
-        success: true,
-        message: "Role selected successfully",
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          isActive: user.is_active,
-          isVerified: user.is_verified,
-        },
-      });
-    } catch (error) {
-      console.error("Select role error:", error);
-
-      return res.status(500).json({
+    if (result.rows.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: "Failed to select role",
+        message: "User not found",
       });
     }
+
+    const user = result.rows[0];
+
+    // Generate new JWT with selected role
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
+
+    return res.json({
+      success: true,
+      message: "Role selected successfully",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isActive: user.is_active,
+        isVerified: user.is_verified,
+      },
+    });
+  } catch (error) {
+    console.error("Select role error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to select role",
+    });
   }
-);
+});
 
 // ==================================================
 // REQUIREMENTS
 // ==================================================
 
-
 // ===============================
 // Create Requirement
 // ===============================
 
-app.post(
-  "/api/requirements",
-  authenticateToken,
-  async (req, res) => {
+app.post("/api/requirements", authenticateToken, async (req, res) => {
   try {
     const {
       title,
@@ -715,81 +696,80 @@ app.post(
       requiredBy,
     } = req.body;
 
+    //     app.post(
+    //   "/api/auth/select-role",
+    //   authenticateToken,
+    //   async (req, res) => {
+    //     try {
+    //       const { role } = req.body;
 
-//     app.post(
-//   "/api/auth/select-role",
-//   authenticateToken,
-//   async (req, res) => {
-//     try {
-//       const { role } = req.body;
+    //       // Only these roles can be selected by normal users
+    //       if (!["buyer", "supplier"].includes(role)) {
+    //         return res.status(400).json({
+    //           success: false,
+    //           message: "Please select a valid role: buyer or supplier",
+    //         });
+    //       }
 
-//       // Only these roles can be selected by normal users
-//       if (!["buyer", "supplier"].includes(role)) {
-//         return res.status(400).json({
-//           success: false,
-//           message: "Please select a valid role: buyer or supplier",
-//         });
-//       }
+    //       // Admin roles cannot be changed from this flow
+    //       if (
+    //         req.user.role === "admin" ||
+    //         req.user.role === "super_admin"
+    //       ) {
+    //         return res.status(403).json({
+    //           success: false,
+    //           message: "Admin roles cannot be changed here",
+    //         });
+    //       }
 
-//       // Admin roles cannot be changed from this flow
-//       if (
-//         req.user.role === "admin" ||
-//         req.user.role === "super_admin"
-//       ) {
-//         return res.status(403).json({
-//           success: false,
-//           message: "Admin roles cannot be changed here",
-//         });
-//       }
+    //       // Update user's role
+    //       const result = await pool.query(
+    //         `
+    //         UPDATE users
+    //         SET role = $1
+    //         WHERE id = $2
+    //         RETURNING id, name, email, phone, role, is_active, is_verified
+    //         `,
+    //         [role, req.user.id]
+    //       );
 
-//       // Update user's role
-//       const result = await pool.query(
-//         `
-//         UPDATE users
-//         SET role = $1
-//         WHERE id = $2
-//         RETURNING id, name, email, phone, role, is_active, is_verified
-//         `,
-//         [role, req.user.id]
-//       );
+    //       if (result.rows.length === 0) {
+    //         return res.status(404).json({
+    //           success: false,
+    //           message: "User not found",
+    //         });
+    //       }
 
-//       if (result.rows.length === 0) {
-//         return res.status(404).json({
-//           success: false,
-//           message: "User not found",
-//         });
-//       }
+    //       const user = result.rows[0];
 
-//       const user = result.rows[0];
+    //       // Create a new JWT with the newly selected role
+    //       const token = jwt.sign(
+    //         {
+    //           userId: user.id,
+    //           role: user.role,
+    //         },
+    //         process.env.JWT_SECRET,
+    //         {
+    //           expiresIn: "7d",
+    //         }
+    //       );
 
-//       // Create a new JWT with the newly selected role
-//       const token = jwt.sign(
-//         {
-//           userId: user.id,
-//           role: user.role,
-//         },
-//         process.env.JWT_SECRET,
-//         {
-//           expiresIn: "7d",
-//         }
-//       );
+    //       res.json({
+    //         success: true,
+    //         message: `Role selected successfully as ${role}`,
+    //         token,
+    //         user,
+    //       });
+    //     } catch (error) {
+    //       console.error("Select role error:", error);
 
-//       res.json({
-//         success: true,
-//         message: `Role selected successfully as ${role}`,
-//         token,
-//         user,
-//       });
-//     } catch (error) {
-//       console.error("Select role error:", error);
-
-//       res.status(500).json({
-//         success: false,
-//         message: "Failed to select role",
-//       });
-//     }
-//   }
-// );
+    //       res.status(500).json({
+    //         success: false,
+    //         message: "Failed to select role",
+    //       });
+    //     }
+    //   }
+    // );
 
     // ===============================
     // VALIDATION
@@ -851,15 +831,11 @@ RETURNING *
         Number(quantity),
         unit.trim(),
         description.trim(),
-        minBudget !== "" && minBudget != null
-          ? Number(minBudget)
-          : null,
-        maxBudget !== "" && maxBudget != null
-          ? Number(maxBudget)
-          : null,
+        minBudget !== "" && minBudget != null ? Number(minBudget) : null,
+        maxBudget !== "" && maxBudget != null ? Number(maxBudget) : null,
         deliveryLocation.trim(),
         requiredBy || null,
-          req.user.id,
+        req.user.id,
       ],
     );
 
@@ -881,9 +857,6 @@ RETURNING *
     });
   }
 });
-
-
-
 
 // ===============================
 // Get All Requirements
@@ -908,10 +881,7 @@ app.get("/api/requirements", async (req, res) => {
       requirements: result.rows,
     });
   } catch (error) {
-    console.error(
-      "Error fetching requirements:",
-      error,
-    );
+    console.error("Error fetching requirements:", error);
 
     res.status(500).json({
       success: false,
@@ -920,19 +890,15 @@ app.get("/api/requirements", async (req, res) => {
   }
 });
 
-
 // ===============================
 // Get My Requirements
 // Logged-in Buyer Only
 // ===============================
 
-app.get(
-  "/api/my-requirements",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const result = await pool.query(
-        `
+app.get("/api/my-requirements", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
         SELECT
           r.*,
           COUNT(q.id)::INTEGER AS quote_count
@@ -943,23 +909,22 @@ app.get(
         GROUP BY r.id
         ORDER BY r.created_at DESC
         `,
-        [req.user.id]
-      );
+      [req.user.id],
+    );
 
-      res.json({
-        success: true,
-        requirements: result.rows,
-      });
-    } catch (error) {
-      console.error("Error fetching my requirements:", error);
+    res.json({
+      success: true,
+      requirements: result.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching my requirements:", error);
 
-      res.status(500).json({
-        success: false,
-        message: "Failed to fetch your requirements",
-      });
-    }
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch your requirements",
+    });
   }
-);
+});
 
 // ===============================
 // Get Single Requirement
@@ -999,10 +964,7 @@ app.get("/api/requirements/:id", async (req, res) => {
       requirement: result.rows[0],
     });
   } catch (error) {
-    console.error(
-      "Error fetching requirement:",
-      error,
-    );
+    console.error("Error fetching requirement:", error);
 
     res.status(500).json({
       success: false,
@@ -1010,7 +972,6 @@ app.get("/api/requirements/:id", async (req, res) => {
     });
   }
 });
-
 
 // ==================================================
 // ADMIN - ALL QUOTES
@@ -1049,7 +1010,6 @@ app.get("/api/admin/quotes", async (req, res) => {
       success: true,
       quotes: result.rows,
     });
-
   } catch (error) {
     console.error("Error fetching admin quotes:", error);
 
@@ -1068,21 +1028,18 @@ app.get("/api/admin/quotes", async (req, res) => {
 // Logged-in Supplier Only
 // ===============================
 
-app.get(
-  "/api/my-quotes",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      // Only suppliers can access this page
-      if (req.user.role !== "supplier") {
-        return res.status(403).json({
-          success: false,
-          message: "Only suppliers can access their quotes",
-        });
-      }
+app.get("/api/my-quotes", authenticateToken, async (req, res) => {
+  try {
+    // Only suppliers can access this page
+    if (req.user.role !== "supplier") {
+      return res.status(403).json({
+        success: false,
+        message: "Only suppliers can access their quotes",
+      });
+    }
 
-      const result = await pool.query(
-        `
+    const result = await pool.query(
+      `
         SELECT
           q.*,
           r.title AS requirement_title,
@@ -1096,96 +1053,85 @@ app.get(
         WHERE q.supplier_user_id = $1
         ORDER BY q.created_at DESC
         `,
-        [req.user.id]
-      );
+      [req.user.id],
+    );
 
-      res.json({
-        success: true,
-        quotes: result.rows,
-      });
-    } catch (error) {
-      console.error("Error fetching my quotes:", error);
+    res.json({
+      success: true,
+      quotes: result.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching my quotes:", error);
 
-      res.status(500).json({
-        success: false,
-        message: "Failed to fetch your quotes",
-      });
-    }
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch your quotes",
+    });
   }
-);
-
+});
 
 // ===============================
 // Create Supplier Quote
 // ===============================
 
-app.post(
-  "/api/quotes",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const {
-        requirementId,
-        supplierName,
-        supplierEmail,
-        quotedPrice,
-        quantity,
-        unit,
-        deliveryTime,
-        message,
-      } = req.body;
+app.post("/api/quotes", authenticateToken, async (req, res) => {
+  try {
+    const {
+      requirementId,
+      supplierName,
+      supplierEmail,
+      quotedPrice,
+      quantity,
+      unit,
+      deliveryTime,
+      message,
+    } = req.body;
 
-      if (
-        !requirementId ||
-        !supplierName ||
-        !quotedPrice ||
-        !quantity ||
-        !unit
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Requirement, supplier name, quoted price, quantity and unit are required",
-        });
-      }
+    if (!requirementId || !supplierName || !quotedPrice || !quantity || !unit) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Requirement, supplier name, quoted price, quantity and unit are required",
+      });
+    }
 
-      // Only suppliers can submit quotes
-      if (req.user.role !== "supplier") {
-        return res.status(403).json({
-          success: false,
-          message: "Only suppliers can submit quotes",
-        });
-      }
+    // Only suppliers can submit quotes
+    if (req.user.role !== "supplier") {
+      return res.status(403).json({
+        success: false,
+        message: "Only suppliers can submit quotes",
+      });
+    }
 
-      // Check requirement
-      const requirementResult = await pool.query(
-        `
+    // Check requirement
+    const requirementResult = await pool.query(
+      `
         SELECT id, status
         FROM requirements
         WHERE id = $1
         `,
-        [requirementId],
-      );
+      [requirementId],
+    );
 
-      if (requirementResult.rows.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "Requirement not found",
-        });
-      }
+    if (requirementResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Requirement not found",
+      });
+    }
 
-      const requirement = requirementResult.rows[0];
+    const requirement = requirementResult.rows[0];
 
-      if (requirement.status === "accepted") {
-        return res.status(400).json({
-          success: false,
-          message: "This requirement has already been accepted",
-        });
-      }
+    if (requirement.status === "accepted") {
+      return res.status(400).json({
+        success: false,
+        message: "This requirement has already been accepted",
+      });
+    }
 
-      // Create quote
-      const result = await pool.query(
-        `
+    // Create quote
+    const result = await pool.query(
+      `
         INSERT INTO quotes (
           requirement_id,
           supplier_user_id,
@@ -1201,22 +1147,22 @@ app.post(
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
         RETURNING *
         `,
-        [
-          requirementId,
-          req.user.id,
-          supplierName,
-          supplierEmail || null,
-          Number(quotedPrice),
-          Number(quantity),
-          unit,
-          deliveryTime || null,
-          message || null,
-        ],
-      );
+      [
+        requirementId,
+        req.user.id,
+        supplierName,
+        supplierEmail || null,
+        Number(quotedPrice),
+        Number(quantity),
+        unit,
+        deliveryTime || null,
+        message || null,
+      ],
+    );
 
-      // Update requirement status
-      await pool.query(
-        `
+    // Update requirement status
+    await pool.query(
+      `
         UPDATE requirements
         SET
           status = 'quoted',
@@ -1224,24 +1170,23 @@ app.post(
         WHERE id = $1
           AND status != 'accepted'
         `,
-        [requirementId],
-      );
+      [requirementId],
+    );
 
-      res.status(201).json({
-        success: true,
-        message: "Quote submitted successfully",
-        quote: result.rows[0],
-      });
-    } catch (error) {
-      console.error("Error creating quote:", error);
+    res.status(201).json({
+      success: true,
+      message: "Quote submitted successfully",
+      quote: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error creating quote:", error);
 
-      res.status(500).json({
-        success: false,
-        message: "Failed to submit quote",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      success: false,
+      message: "Failed to submit quote",
+    });
+  }
+});
 
 // ===============================
 // Get Quotes For Requirement
@@ -1874,44 +1819,43 @@ app.put("/api/insights/:id", async (req, res) => {
   }
 });
 
-
 app.delete("/api/admin/suppliers/:id", authenticateToken, async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
 
     if (!["admin", "super_admin"].includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: "Admin access required",
-      })
+      });
     }
 
     const result = await pool.query(
       "DELETE FROM suppliers WHERE id = $1 RETURNING id, name",
-      [id]
-    )
+      [id],
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Company not found",
-      })
+      });
     }
 
     return res.json({
       success: true,
       message: "Company deleted successfully",
       company: result.rows[0],
-    })
+    });
   } catch (error) {
-    console.error("Delete supplier error:", error)
+    console.error("Delete supplier error:", error);
 
     return res.status(500).json({
       success: false,
       message: "Failed to delete company",
-    })
+    });
   }
-})
+});
 
 // ===============================
 // CREATE COMPANY / SUPPLIER
@@ -1980,185 +1924,6 @@ app.post("/api/suppliers", async (req, res) => {
     const galleryImagesArray = Array.isArray(galleryImages)
       ? galleryImages.filter(Boolean)
       : [];
-
-
-    // ==================================================
-// UPDATE COMPANY / SUPPLIER
-// ==================================================
-
-app.put(
-  "/api/admin/suppliers/:id",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-
-      // ===============================
-      // ADMIN CHECK
-      // ===============================
-
-      if (
-        !["admin", "super_admin"].includes(
-          req.user.role
-        )
-      ) {
-        return res.status(403).json({
-          success: false,
-          message: "Admin access required",
-        });
-      }
-
-      // ===============================
-      // REQUEST DATA
-      // ===============================
-
-      const {
-        name,
-        businessType,
-        industry,
-        location,
-        address,
-        description,
-        phone,
-        email,
-        yearsInBusiness,
-        verified,
-        services,
-        serviceAreas,
-        imageUrl,
-        galleryImages,
-      } = req.body;
-
-      // ===============================
-      // VALIDATION
-      // ===============================
-
-      if (!name || !name.trim()) {
-        return res.status(400).json({
-          success: false,
-          message: "Company name is required",
-        });
-      }
-
-      // ===============================
-      // SERVICES
-      // ===============================
-
-      const servicesArray = Array.isArray(
-        services
-      )
-        ? services.filter(Boolean)
-        : services
-          ? services
-              .split(",")
-              .map((item) => item.trim())
-              .filter(Boolean)
-          : [];
-
-      // ===============================
-      // SERVICE AREAS
-      // ===============================
-
-      const serviceAreasArray =
-        Array.isArray(serviceAreas)
-          ? serviceAreas.filter(Boolean)
-          : serviceAreas
-            ? serviceAreas
-                .split(",")
-                .map((item) => item.trim())
-                .filter(Boolean)
-            : [];
-
-      // ===============================
-      // GALLERY
-      // ===============================
-
-      const galleryImagesArray =
-        Array.isArray(galleryImages)
-          ? galleryImages.filter(Boolean)
-          : [];
-
-      // ===============================
-      // UPDATE
-      // ===============================
-
-      const result = await pool.query(
-        `
-        UPDATE suppliers
-        SET
-          name = $1,
-          business_type = $2,
-          industry = $3,
-          location = $4,
-          address = $5,
-          description = $6,
-          phone = $7,
-          email = $8,
-          years_in_business = $9,
-          verified = $10,
-          services = $11,
-          service_areas = $12,
-          image_url = $13,
-          gallery_images = $14,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE id = $15
-        RETURNING *
-        `,
-        [
-          name.trim(),
-          businessType || null,
-          industry || null,
-          location || null,
-          address || null,
-          description || null,
-          phone || null,
-          email || null,
-          yearsInBusiness !== ""
-            ? Number(yearsInBusiness)
-            : null,
-          Boolean(verified),
-          servicesArray,
-          serviceAreasArray,
-          imageUrl || null,
-          galleryImagesArray,
-          id,
-        ]
-      );
-
-      // ===============================
-      // COMPANY NOT FOUND
-      // ===============================
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "Company not found",
-        });
-      }
-
-      // ===============================
-      // SUCCESS
-      // ===============================
-
-      return res.json({
-        success: true,
-        message:
-          "Company updated successfully",
-        company: result.rows[0],
-      });
-    } catch (error) {
-      console.error(
-        "Update supplier error:",
-        error
-      );
-
-      return res.status(500).json({
-        success: false,
-        message: "Failed to update company",
-      });
-    }
-  }
-);  
 
     // ===============================
     // Create company
@@ -2237,6 +2002,167 @@ app.put(
   }
 });
 
+// ==================================================
+// UPDATE COMPANY / SUPPLIER
+// ==================================================
+
+app.put("/api/admin/suppliers/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // ===============================
+    // ADMIN CHECK
+    // ===============================
+
+    if (!["admin", "super_admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Admin access required",
+      });
+    }
+
+    // ===============================
+    // REQUEST DATA
+    // ===============================
+
+    const {
+      name,
+      businessType,
+      industry,
+      location,
+      address,
+      description,
+      phone,
+      email,
+      yearsInBusiness,
+      verified,
+      services,
+      serviceAreas,
+      imageUrl,
+      galleryImages,
+    } = req.body;
+
+    // ===============================
+    // VALIDATION
+    // ===============================
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Company name is required",
+      });
+    }
+
+    // ===============================
+    // SERVICES
+    // ===============================
+
+    const servicesArray = Array.isArray(services)
+      ? services.filter(Boolean)
+      : services
+        ? services
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [];
+
+    // ===============================
+    // SERVICE AREAS
+    // ===============================
+
+    const serviceAreasArray = Array.isArray(serviceAreas)
+      ? serviceAreas.filter(Boolean)
+      : serviceAreas
+        ? serviceAreas
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [];
+
+    // ===============================
+    // GALLERY
+    // ===============================
+
+    const galleryImagesArray = Array.isArray(galleryImages)
+      ? galleryImages.filter(Boolean)
+      : [];
+
+    // ===============================
+    // UPDATE COMPANY
+    // ===============================
+
+    const result = await pool.query(
+      `
+        UPDATE suppliers
+        SET
+          name = $1,
+          business_type = $2,
+          industry = $3,
+          location = $4,
+          address = $5,
+          description = $6,
+          phone = $7,
+          email = $8,
+          years_in_business = $9,
+          verified = $10,
+          services = $11,
+          service_areas = $12,
+          image_url = $13,
+          gallery_images = $14,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $15
+        RETURNING *
+        `,
+      [
+        name.trim(),
+        businessType || null,
+        industry || null,
+        location || null,
+        address || null,
+        description || null,
+        phone || null,
+        email || null,
+        yearsInBusiness ? Number(yearsInBusiness) : null,
+        Boolean(verified),
+        servicesArray,
+        serviceAreasArray,
+        imageUrl || null,
+        galleryImagesArray,
+        id,
+      ],
+    );
+
+    // ===============================
+    // COMPANY NOT FOUND
+    // ===============================
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+
+    // ===============================
+    // SUCCESS
+    // ===============================
+
+    return res.status(200).json({
+      success: true,
+      message: "Company updated successfully",
+      company: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Update company error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update company",
+      error: error.message,
+    });
+  }
+});
+
 // ===============================
 // UPLOAD COMPANY IMAGES
 // ===============================
@@ -2254,8 +2180,7 @@ app.post(
       }
 
       const imageUrls = req.files.map(
-        (file) =>
-          `/uploads/companies/${file.filename}`,
+        (file) => `/uploads/companies/${file.filename}`,
       );
 
       res.status(201).json({
@@ -2290,14 +2215,13 @@ app.post(
         });
       }
 
-      const imageUrl =
-  `/uploads/products/${req.file.filename}`;
+      const imageUrl = `/uploads/products/${req.file.filename}`;
 
-res.status(201).json({
-  success: true,
-  message: "Product image uploaded successfully.",
-  image_url: imageUrl,
-});
+      res.status(201).json({
+        success: true,
+        message: "Product image uploaded successfully.",
+        image_url: imageUrl,
+      });
     } catch (error) {
       console.error("Product image upload error:", error);
 
@@ -2489,7 +2413,7 @@ app.post(
         });
       }
 
-const imageUrl = `/uploads/insights/${req.file.filename}`;
+      const imageUrl = `/uploads/insights/${req.file.filename}`;
       res.status(201).json({
         success: true,
         message: "Image uploaded successfully.",

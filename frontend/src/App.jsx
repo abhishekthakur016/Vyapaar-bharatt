@@ -43,10 +43,8 @@ import MyProfile from "./pages/MyProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierDashboard from "./pages/SupplierDashboard";
-import ImageCarousel from "./components/ImageCarousel"
+import ImageCarousel from "./components/ImageCarousel";
 import AdminEditCompany from "./pages/AdminEditCompany";
-
-
 
 function Home() {
   return (
@@ -168,7 +166,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white">
-
       {/* =========================
           PUBLIC NAVBAR
       ========================== */}
@@ -180,113 +177,49 @@ function App() {
       ========================== */}
 
       <Routes>
-
         {/* HOME */}
-
         <Route path="/" element={<Home />} />
-
         {/* PUBLIC PAGES */}
-
         <Route path="/for-buyers" element={<ForBuyers />} />
-
         <Route path="/suppliers/:id" element={<SupplierDetails />} />
-
-        <Route
-          path="/post-requirement"
-          element={<PostRequirement />}
-        />
-
-        <Route
-          path="/requirements"
-          element={<Requirements />}
-        />
-
-        <Route
-          path="/requirements/:id"
-          element={<RequirementDetails />}
-        />
-
+        <Route path="/post-requirement" element={<PostRequirement />} />
+        <Route path="/requirements" element={<Requirements />} />
+        <Route path="/requirements/:id" element={<RequirementDetails />} />
         <Route
           path="/supplier/requirements"
           element={<SupplierRequirements />}
         />
-
         <Route path="/products" element={<Products />} />
-
-        <Route
-          path="/products/:id"
-          element={<ProductDetails />}
-        />
-
-        <Route
-          path="/supplier-rfqs"
-          element={<SupplierRFQs />}
-        />
-
+        <Route path="/products/:id" element={<ProductDetails />} />
+        <Route path="/supplier-rfqs" element={<SupplierRFQs />} />
         {/* INSIGHTS */}
-
         <Route path="/insights" element={<Insights />} />
-
-        <Route
-          path="/insights/:id"
-          element={<InsightDetails />}
-        />
-
+        <Route path="/insights/:id" element={<InsightDetails />} />
         {/* LOGIN */}
-
         <Route path="/login" element={<Login />} />
-
         {/* USER PAGES */}
-
-        <Route
-          path="/my-requirements"
-          element={<MyRequirements />}
-        />
-
-        <Route
-          path="/my-quotes"
-          element={<MyQuotes />}
-        />
-
-        <Route
-          path="/my-profile"
-          element={<MyProfile />}
-        />
-
+        <Route path="/my-requirements" element={<MyRequirements />} />
+        <Route path="/my-quotes" element={<MyQuotes />} />
+        <Route path="/my-profile" element={<MyProfile />} />
         {/* =========================
             ADMIN ROUTES
         ========================== */}
-
         <Route
-          element={
-            <ProtectedRoute
-              allowedRoles={["admin", "super_admin"]}
-            />
-          }
+          element={<ProtectedRoute allowedRoles={["admin", "super_admin"]} />}
         >
-          <Route
-            path="/admin/dashboard"
-            element={<AdminDashboard />}
-          />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+          <Route path="/admin/companies" element={<AdminCompanies />} />
+
+          <Route path="/admin/companies/add" element={<AdminAddCompany />} />
+
+          <Route path="/admin/products" element={<AdminProducts />} />
+
+          <Route path="/admin/products/add" element={<AdminAddProduct />} />
 
           <Route
-            path="/admin/companies"
-            element={<AdminCompanies />}
-          />
-
-          <Route
-            path="/admin/companies/add"
-            element={<AdminAddCompany />}
-          />
-
-          <Route
-            path="/admin/products"
-            element={<AdminProducts />}
-          />
-
-          <Route
-            path="/admin/products/add"
-            element={<AdminAddProduct />}
+            path="/admin/companies/:id/edit"
+            element={<AdminEditCompany />}
           />
 
           <Route
@@ -294,37 +227,17 @@ function App() {
             element={<AdminEditProduct />}
           />
 
-          <Route
-            path="/admin/requirements"
-            element={<AdminRequirements />}
-          />
+          <Route path="/admin/requirements" element={<AdminRequirements />} />
 
-          <Route
-            path="/admin/insights"
-            element={<InsightsAdmin />}
-          />
+          <Route path="/admin/insights" element={<InsightsAdmin />} />
         </Route>
-
         {/* =========================
             SUPPLIER ROUTES
         ========================== */}
-
-        <Route
-          element={
-            <ProtectedRoute allowedRoles={["supplier"]} />
-          }
-        >
-          <Route
-            path="/supplier/dashboard"
-            element={<SupplierDashboard />}
-          />
+        <Route element={<ProtectedRoute allowedRoles={["supplier"]} />}>
+          <Route path="/supplier/dashboard" element={<SupplierDashboard />} />
         </Route>
-
-        <Route
-  path="/admin/companies/:id/edit"
-  element={<AdminEditCompany />}
-/>
-
+        \
       </Routes>
 
       {/* =========================
@@ -339,7 +252,6 @@ function App() {
 
       {showLoginPopup && !isLoggedIn && !isLoginPage && (
         <div className="relative">
-
           {/* CROSS BUTTON */}
 
           <button
@@ -358,14 +270,9 @@ function App() {
 
           {/* LOGIN POPUP */}
 
-          <Login
-            isModal={true}
-            onSuccess={handleLoginSuccess}
-          />
-
+          <Login isModal={true} onSuccess={handleLoginSuccess} />
         </div>
       )}
-
     </div>
   );
 }
