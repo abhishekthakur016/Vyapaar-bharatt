@@ -25,7 +25,7 @@ function ImageCarousel() {
   const carouselImages = [...images, ...images];
 
   return (
-    <section className="w-full overflow-hidden bg-[#0952d4] py-5 sm:py-7">
+    <section className="w-full overflow-hidden bg-[#f8fafc] py-5 sm:py-7">
       <div className="relative w-full overflow-hidden">
         {/* LEFT FADE */}
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-10 bg-gradient-to-r from-white to-transparent sm:w-20" />

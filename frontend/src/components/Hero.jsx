@@ -183,7 +183,7 @@ function Hero() {
 
             {/* Hindi Heading */}
             <h1 className="max-w-[600px] text-[48px] font-black leading-[0.98] tracking-[-0.035em] text-[#071a40] sm:text-[58px] lg:text-[62px] xl:text-[70px]">
-             Trade Across
+              Trade Across
               <br />
               <span className="text-[#fd641c]">India.</span>
             </h1>
