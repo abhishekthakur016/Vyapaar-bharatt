@@ -2548,6 +2548,63 @@ app.put("/api/products/:id", async (req, res) => {
   }
 });
 
+/* ===============================
+   UPDATE MY PROFILE
+================================ */
+
+app.patch("/api/auth/profile", authenticateToken, async (req, res) => {
+  try {
+    const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
+
+    const phone =
+      typeof req.body.phone === "string" ? req.body.phone.trim() : "";
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required",
+      });
+    }
+
+    if (name.length > 255 || phone.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Name or phone number is too long",
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE users
+       SET name = $1,
+           phone = $2,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $3
+       RETURNING id, name, email, phone, role, is_verified`,
+      [name, phone || null, req.user.id],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Profile update error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update profile",
+    });
+  }
+});
+
 // ==================================================
 // START SERVER
 // ==================================================
