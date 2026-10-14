@@ -57,7 +57,7 @@ function Navbar() {
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
       {/* Top announcement */}
       <div className="hidden bg-[#0952d4] px-6 py-2 text-center text-xs font-medium text-white md:block">
-        India's B2B Trade Network — Discover. Connect. Trade. Grow.
+        India'sb2b & b2c Trade Network — Discover. Connect. Trade. Grow.
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -80,7 +80,7 @@ function Navbar() {
               </div>
 
               <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-500">
-                B2B Trade Network
+                b2b & b2c Trade Network
               </div>
             </div>
           </Link>

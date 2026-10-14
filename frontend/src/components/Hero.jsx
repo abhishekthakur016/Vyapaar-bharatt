@@ -177,7 +177,7 @@ function Hero() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#fd8836] shadow-[0_0_0_5px_rgba(253,136,54,0.10)]" />
 
               <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#0b1f3a]">
-                India's B2B & B2C Trade Network
+                India'sb2b & b2c & B2C Trade Network
               </span>
             </div>
 

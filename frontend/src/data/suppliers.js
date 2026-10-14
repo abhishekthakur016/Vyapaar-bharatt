@@ -15,7 +15,7 @@ export const suppliers = [
     reviews: 126,
     verified: true,
     description:
-      "Industrial machinery and engineering solutions supplier serving B2B buyers across India.",
+      "Industrial machinery and engineering solutions supplier servingb2b & b2c buyers across India.",
     productsList: [
       {
         name: "Industrial Machinery",
@@ -307,13 +307,7 @@ export const suppliers = [
       "Full Load",
       "Daily Transport Service",
     ],
-    serviceAreas: [
-      "Baddi",
-      "Nalagarh",
-      "Delhi",
-      "Uttar Pradesh",
-      "Pan India",
-    ],
+    serviceAreas: ["Baddi", "Nalagarh", "Delhi", "Uttar Pradesh", "Pan India"],
     freightPricing: {
       priceType: "Price on Request",
       priceUnit: "Trip",
@@ -347,10 +341,7 @@ export const suppliers = [
         image: null,
       },
     ],
-    services: [
-      "Vehicle Body Building",
-      "Commercial Vehicle Body Work",
-    ],
+    services: ["Vehicle Body Building", "Commercial Vehicle Body Work"],
     serviceAreas: ["Punjab", "Haryana", "Himachal Pradesh", "Pan India"],
     phone: "",
     email: "",
@@ -473,8 +464,7 @@ export const suppliers = [
     rating: null,
     reviews: 0,
     verified: false,
-    description:
-      "Industrial lifting and material handling equipment supplier.",
+    description: "Industrial lifting and material handling equipment supplier.",
     productsList: [
       {
         name: "Chain Pulley Block",
@@ -679,8 +669,7 @@ export const suppliers = [
     rating: null,
     reviews: 0,
     verified: false,
-    description:
-      "Manufacturer of machine tools based in Ludhiana, Punjab.",
+    description: "Manufacturer of machine tools based in Ludhiana, Punjab.",
     productsList: [
       {
         name: "Machine Tools",
@@ -697,4 +686,4 @@ export const suppliers = [
     image: null,
     source: "sellers.pdf",
   },
-]
+];

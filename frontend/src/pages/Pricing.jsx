@@ -1,18 +1,11 @@
-import {
-  Check,
-  Crown,
-  Building2,
-  Zap,
-  ArrowRight,
-} from "lucide-react"
-import { Link } from "react-router-dom"
+import { Check, Crown, Building2, Zap, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Pricing() {
   const plans = [
     {
       name: "Free",
-      description:
-        "Get started with essential B2B marketplace features.",
+      description: "Get started with essentialb2b & b2c marketplace features.",
       price: "₹0",
       period: "forever",
       icon: Zap,
@@ -23,13 +16,12 @@ function Pricing() {
         "Post up to 3 requirements",
         "Receive supplier quotes",
         "Basic supplier discovery",
-        "Access to B2B marketplace",
+        "Access tob2b & b2c marketplace",
       ],
     },
     {
       name: "Business",
-      description:
-        "Powerful tools for growing businesses and active buyers.",
+      description: "Powerful tools for growing businesses and active buyers.",
       price: "₹999",
       period: "per month",
       icon: Crown,
@@ -47,8 +39,7 @@ function Pricing() {
     },
     {
       name: "Enterprise",
-      description:
-        "Advanced sourcing solutions for large organizations.",
+      description: "Advanced sourcing solutions for large organizations.",
       price: "Custom",
       period: "tailored for your business",
       icon: Building2,
@@ -64,18 +55,16 @@ function Pricing() {
         "Enterprise support",
       ],
     },
-  ]
+  ];
 
   return (
     <main className="min-h-screen bg-slate-50">
-
       {/* ==================================================
           HERO
       ================================================== */}
 
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 lg:px-8">
-
           <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-xs font-bold text-[#0952d4]">
             <Crown size={15} />
             SIMPLE & TRANSPARENT PRICING
@@ -83,16 +72,13 @@ function Pricing() {
 
           <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-bold leading-tight text-[#0b1f3a] md:text-5xl">
             Plans Built for
-            <span className="text-[#0952d4]">
-              {" "}Every Business
-            </span>
+            <span className="text-[#0952d4]"> Every Business</span>
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">
-            Start sourcing smarter today. Choose a plan
-            that fits your business and scale as you grow.
+            Start sourcing smarter today. Choose a plan that fits your business
+            and scale as you grow.
           </p>
-
         </div>
       </section>
 
@@ -101,11 +87,9 @@ function Pricing() {
       ================================================== */}
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-
         <div className="grid gap-6 lg:grid-cols-3">
-
           {plans.map((plan) => {
-            const Icon = plan.icon
+            const Icon = plan.icon;
 
             return (
               <div
@@ -116,7 +100,6 @@ function Pricing() {
                     : "border-slate-200"
                 }`}
               >
-
                 {/* Popular Badge */}
 
                 {plan.popular && (
@@ -150,9 +133,7 @@ function Pricing() {
                 {/* Price */}
 
                 <div className="mt-7 border-b border-slate-100 pb-7">
-
                   <div className="flex items-end gap-2">
-
                     <span className="text-4xl font-bold text-[#0b1f3a]">
                       {plan.price}
                     </span>
@@ -162,9 +143,7 @@ function Pricing() {
                         {plan.period}
                       </span>
                     )}
-
                   </div>
-
                 </div>
 
                 {/* Button */}
@@ -184,39 +163,29 @@ function Pricing() {
                 {/* Features */}
 
                 <div className="mt-7">
-
                   <p className="text-sm font-bold text-[#0b1f3a]">
                     What's included
                   </p>
 
                   <ul className="mt-4 space-y-3">
-
                     {plan.features.map((feature) => (
                       <li
                         key={feature}
                         className="flex items-start gap-3 text-sm text-slate-600"
                       >
                         <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-50">
-                          <Check
-                            size={13}
-                            className="text-green-600"
-                          />
+                          <Check size={13} className="text-green-600" />
                         </span>
 
                         <span>{feature}</span>
                       </li>
                     ))}
-
                   </ul>
-
                 </div>
-
               </div>
-            )
+            );
           })}
-
         </div>
-
       </section>
 
       {/* ==================================================
@@ -224,14 +193,9 @@ function Pricing() {
       ================================================== */}
 
       <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
-
         <div className="overflow-hidden rounded-3xl bg-[#0b1f3a] px-6 py-10 text-center sm:px-10">
-
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
-            <Building2
-              size={23}
-              className="text-white"
-            />
+            <Building2 size={23} className="text-white" />
           </div>
 
           <h2 className="mt-5 text-2xl font-bold text-white md:text-3xl">
@@ -239,8 +203,8 @@ function Pricing() {
           </h2>
 
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Talk to our team about enterprise sourcing,
-            supplier discovery and customized B2B solutions.
+            Talk to our team about enterprise sourcing, supplier discovery and
+            customizedb2b & b2c solutions.
           </p>
 
           <Link
@@ -250,13 +214,10 @@ function Pricing() {
             Talk to Our Team
             <ArrowRight size={18} />
           </Link>
-
         </div>
-
       </section>
-
     </main>
-  )
+  );
 }
 
-export default Pricing
+export default Pricing;

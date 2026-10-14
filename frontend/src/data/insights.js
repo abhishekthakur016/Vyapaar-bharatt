@@ -41,18 +41,18 @@ export const insightCategories = [
       "Discover manufacturing insights, industrial capabilities, quality, and production trends.",
     icon: "factory",
   },
-]
+];
 
 export const insights = [
   {
     id: 1,
     category: "Market Insights",
     categoryId: "market-insights",
-    title: "How to Find the Right B2B Supplier for Your Business",
+    title: "How to Find the Rightb2b & b2c Supplier for Your Business",
     excerpt:
       "Key factors to consider when evaluating suppliers, comparing capabilities, pricing, quality, and reliability.",
     content: `
-Finding the right B2B supplier is one of the most important decisions for a growing business.
+Finding the rightb2b & b2c supplier is one of the most important decisions for a growing business.
 
 A reliable supplier can help you maintain consistent product quality, manage costs, and fulfil customer orders on time.
 
@@ -78,7 +78,7 @@ A supplier that works well for a small order may not necessarily have the capaci
 
 ### 4. Delivery Reliability
 
-Delivery timelines are critical for B2B businesses.
+Delivery timelines are critical forb2b & b2c businesses.
 
 Ask suppliers about lead times, dispatch schedules, logistics arrangements, and their ability to handle urgent requirements.
 
@@ -105,7 +105,7 @@ Look at quality, reliability, capacity, pricing, delivery, and communication tog
     content: `
 Supplier discovery can take a significant amount of time when businesses depend on scattered information and manual research.
 
-A structured B2B marketplace can simplify this process by bringing suppliers, products, categories, and business information together.
+A structuredb2b & b2c marketplace can simplify this process by bringing suppliers, products, categories, and business information together.
 
 ### Search Faster
 
@@ -140,7 +140,7 @@ Better supplier discovery can help businesses spend less time searching and more
     id: 3,
     category: "Trade & Export",
     categoryId: "trade-export",
-    title: "Growing Your Business Through New B2B Trade Opportunities",
+    title: "Growing Your Business Through Newb2b & b2c Trade Opportunities",
     excerpt:
       "Learn how businesses can explore new markets, connect with buyers, and identify new trade opportunities.",
     content: `
@@ -170,14 +170,14 @@ Clear business information, communication, product quality, and reliable fulfilm
 
 ### Conclusion
 
-Expanding into new B2B markets requires consistent visibility, reliable relationships, and a clear understanding of buyer requirements.
+Expanding into newb2b & b2c markets requires consistent visibility, reliable relationships, and a clear understanding of buyer requirements.
 `,
   },
   {
     id: 4,
     category: "Sourcing Guides",
     categoryId: "sourcing-guides",
-    title: "A Practical Guide to Comparing B2B Suppliers",
+    title: "A Practical Guide to Comparingb2b & b2c Suppliers",
     excerpt:
       "Understand the key points businesses should check before selecting a supplier.",
     content: `
@@ -212,7 +212,7 @@ Create a simple comparison of price, quality, MOQ, delivery, and supplier capabi
     id: 5,
     category: "Business Tips",
     categoryId: "business-tips",
-    title: "5 Ways to Improve Your B2B Procurement Process",
+    title: "5 Ways to Improve Yourb2b & b2c Procurement Process",
     excerpt:
       "Simple ways businesses can organize purchasing and make supplier management more efficient.",
     content: `
@@ -278,8 +278,8 @@ If your product requires customization, make sure the manufacturer has experienc
 The right manufacturing partner should be evaluated on capability, quality, capacity, lead time, and communication.
 `,
   },
-]
+];
 
 export function getInsightById(id) {
-  return insights.find((insight) => String(insight.id) === String(id))
+  return insights.find((insight) => String(insight.id) === String(id));
 }

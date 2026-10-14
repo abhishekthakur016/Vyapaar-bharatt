@@ -173,8 +173,8 @@ function Categories() {
             </h2>
 
             <p className="mt-3 max-w-2xl text-base leading-7 text-gray-500">
-              Discover products and suppliers across India's largest B2B trade
-              categories.
+              Discover products and suppliers across India's largestb2b & b2c
+              trade categories.
             </p>
           </div>
 

@@ -384,7 +384,7 @@ function Suppliers() {
 
               <div className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-500 shadow-sm">
                 <Building2 size={14} />
-                B2B Supplier Network
+                b2b & b2c Supplier Network
               </div>
             </div>
 
