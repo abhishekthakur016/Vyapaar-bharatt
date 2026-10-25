@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { Link, useParams } from "react-router-dom";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,15 +24,32 @@ export default function SupplierDetails() {
   const { id } = useParams();
 
   const [supplier, setSupplier] = useState(null);
+
   const [products, setProducts] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
+
   const [activeImage, setActiveImage] = useState(0);
+  const [showEnquiry, setShowEnquiry] = useState(false);
+  const [enquiry, setEnquiry] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [enquiryLoading, setEnquiryLoading] = useState(false);
+  const [enquiryFeedback, setEnquiryFeedback] = useState({
+    type: "",
+    message: "",
+  });
 
   useEffect(() => {
     const fetchSupplier = async () => {
       try {
         setLoading(true);
+
         setError("");
 
         const response = await fetch(`/api/suppliers/${id}`);
@@ -43,13 +62,18 @@ export default function SupplierDetails() {
 
         const supplierData = {
           ...data.supplier,
+
           businessType: data.supplier.business_type,
+
           serviceAreas: data.supplier.service_areas || [],
+
           services: data.supplier.services || [],
         };
 
         setSupplier(supplierData);
+
         // Fetch products belonging to this supplier
+
         const productsResponse = await fetch("/api/products");
 
         const productsData = await productsResponse.json();
@@ -63,6 +87,7 @@ export default function SupplierDetails() {
         }
       } catch (err) {
         console.error("Error loading supplier:", err);
+
         setError(err.message || "Failed to load supplier");
       } finally {
         setLoading(false);
@@ -71,6 +96,49 @@ export default function SupplierDetails() {
 
     fetchSupplier();
   }, [id]);
+
+  const handleEnquirySubmit = async (event) => {
+    event.preventDefault();
+    setEnquiryLoading(true);
+    setEnquiryFeedback({ type: "", message: "" });
+
+    try {
+      const response = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          supplier_id: supplier.id ?? id,
+          supplier_name: supplier.name,
+          name: enquiry.name.trim(),
+          email: enquiry.email.trim(),
+          phone: enquiry.phone.trim(),
+          message: enquiry.message.trim(),
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.success === false) {
+        throw new Error(
+          data.message || "Could not send your enquiry. Please try again.",
+        );
+      }
+
+      setEnquiryFeedback({
+        type: "success",
+        message:
+          data.message || "Your enquiry has been submitted successfully.",
+      });
+      setEnquiry({ name: "", email: "", phone: "", message: "" });
+    } catch (err) {
+      setEnquiryFeedback({
+        type: "error",
+        message:
+          err.message || "Could not send your enquiry. Please try again.",
+      });
+    } finally {
+      setEnquiryLoading(false);
+    }
+  };
 
   const galleryImages = useMemo(() => {
     if (!supplier) return [];
@@ -112,10 +180,15 @@ export default function SupplierDetails() {
     if (!supplier?.name) return "VB";
 
     return supplier.name
+
       .split(" ")
+
       .slice(0, 2)
+
       .map((word) => word.charAt(0))
+
       .join("")
+
       .toUpperCase();
   };
 
@@ -131,6 +204,7 @@ export default function SupplierDetails() {
 
               <div className="space-y-3">
                 <div className="h-8 w-72 animate-pulse rounded bg-white/20" />
+
                 <div className="h-4 w-48 animate-pulse rounded bg-white/20" />
               </div>
             </div>
@@ -141,6 +215,7 @@ export default function SupplierDetails() {
           <div className="grid gap-6 lg:grid-cols-[1fr_330px]">
             <div className="space-y-6">
               <div className="h-[430px] animate-pulse rounded-3xl bg-slate-200" />
+
               <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />
             </div>
 
@@ -180,6 +255,7 @@ export default function SupplierDetails() {
   return (
     <main className="min-h-screen bg-slate-50">
       {/* ================= HEADER ================= */}
+
       <section className="bg-[#0952d4]">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <Link
@@ -193,6 +269,7 @@ export default function SupplierDetails() {
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
               {/* Supplier logo */}
+
               <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white text-2xl font-black text-[#0952d4] shadow-lg">
                 {supplier.image_url ? (
                   <img
@@ -225,12 +302,20 @@ export default function SupplierDetails() {
 
                 <div className="mt-2 flex items-center gap-1.5 text-sm text-blue-100">
                   <MapPin size={15} />
+
                   {supplier.location || "India"}
                 </div>
               </div>
             </div>
 
-            <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-orange-600">
+            <button
+              type="button"
+              onClick={() => {
+                setShowEnquiry(true);
+                setEnquiryFeedback({ type: "", message: "" });
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-orange-600"
+            >
               <Send size={17} />
               Request Best Quote
             </button>
@@ -239,15 +324,19 @@ export default function SupplierDetails() {
       </section>
 
       {/* ================= MAIN ================= */}
+
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_330px]">
           {/* ================= LEFT ================= */}
+
           <div className="space-y-6">
             {/* ================= MODERN GALLERY ================= */}
+
             <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
               {galleryImages.length > 0 ? (
                 <>
                   {/* Main image */}
+
                   <div className="group relative aspect-[16/9] overflow-hidden bg-slate-100">
                     <img
                       src={galleryImages[activeImage]}
@@ -256,15 +345,18 @@ export default function SupplierDetails() {
                     />
 
                     {/* Gradient */}
+
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/50 to-transparent" />
 
                     {/* Image counter */}
+
                     <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full bg-black/50 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
                       <ImageIcon size={14} />
                       {activeImage + 1} / {galleryImages.length}
                     </div>
 
                     {/* Previous */}
+
                     {galleryImages.length > 1 && (
                       <button
                         onClick={previousImage}
@@ -276,6 +368,7 @@ export default function SupplierDetails() {
                     )}
 
                     {/* Next */}
+
                     {galleryImages.length > 1 && (
                       <button
                         onClick={nextImage}
@@ -287,6 +380,7 @@ export default function SupplierDetails() {
                     )}
 
                     {/* Supplier name overlay */}
+
                     <div className="absolute bottom-5 right-5 hidden max-w-[60%] text-right sm:block">
                       <p className="text-lg font-bold text-white">
                         {supplier.name}
@@ -299,6 +393,7 @@ export default function SupplierDetails() {
                   </div>
 
                   {/* Thumbnails */}
+
                   <div className="border-t border-slate-100 p-4">
                     <div className="flex gap-3 overflow-x-auto pb-1">
                       {galleryImages.map((image, index) => (
@@ -327,6 +422,7 @@ export default function SupplierDetails() {
                 </>
               ) : (
                 /* Gallery fallback */
+
                 <div className="flex aspect-[16/9] flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100">
                   <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-2xl font-black text-[#0952d4] shadow-sm">
                     {getSupplierInitials()}
@@ -344,6 +440,7 @@ export default function SupplierDetails() {
             </section>
 
             {/* ================= ABOUT ================= */}
+
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-[#0b1f3a]">
                 About {supplier.name}
@@ -388,6 +485,7 @@ export default function SupplierDetails() {
             </section>
 
             {/* ================= PRODUCTS ================= */}
+
             {products.length > 0 && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div>
@@ -455,6 +553,7 @@ export default function SupplierDetails() {
             )}
 
             {/* ================= SERVICES ================= */}
+
             {supplier.services?.length > 0 && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
                 <h2 className="text-xl font-bold text-[#0b1f3a]">Services</h2>
@@ -479,6 +578,7 @@ export default function SupplierDetails() {
             )}
 
             {/* ================= SERVICE AREAS ================= */}
+
             {supplier.serviceAreas?.length > 0 && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="flex items-center gap-3">
@@ -504,12 +604,21 @@ export default function SupplierDetails() {
           </div>
 
           {/* ================= RIGHT SIDEBAR ================= */}
+
           <aside className="space-y-5">
             {/* Contact */}
+
             <div className="rounded-2xl border border-slate-200 bg-white p-5 lg:sticky lg:top-24">
               <h2 className="font-bold text-[#0b1f3a]">Contact Supplier</h2>
 
-              <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEnquiry(true);
+                  setEnquiryFeedback({ type: "", message: "" });
+                }}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
+              >
                 <Send size={17} />
                 Send Enquiry
               </button>
@@ -550,6 +659,7 @@ export default function SupplierDetails() {
             </div>
 
             {/* Trust */}
+
             <div className="rounded-2xl bg-blue-50 p-5">
               <div className="flex items-center gap-3">
                 <ShieldCheck className="text-blue-600" size={25} />
@@ -564,6 +674,7 @@ export default function SupplierDetails() {
             </div>
 
             {/* Rating */}
+
             {supplier.rating && (
               <div className="rounded-2xl border border-slate-200 bg-white p-5">
                 <h3 className="font-bold text-[#0b1f3a]">Supplier Rating</h3>
@@ -594,6 +705,153 @@ export default function SupplierDetails() {
           </aside>
         </div>
       </section>
+
+      {showEnquiry && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="enquiry-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !enquiryLoading)
+              setShowEnquiry(false);
+          }}
+        >
+          <div className="my-8 w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
+                  Contact supplier
+                </p>
+                <h2
+                  id="enquiry-title"
+                  className="mt-2 text-2xl font-black text-[#0b1f3a]"
+                >
+                  Send Enquiry
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Your enquiry will be sent regarding{" "}
+                  <strong>{supplier.name}</strong>.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEnquiry(false)}
+                disabled={enquiryLoading}
+                aria-label="Close enquiry form"
+                className="rounded-full p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-50"
+              >
+                <span className="text-2xl leading-none">×</span>
+              </button>
+            </div>
+
+            {enquiryFeedback.message && (
+              <div
+                className={`mt-5 rounded-xl p-3 text-sm ${
+                  enquiryFeedback.type === "success"
+                    ? "border border-green-200 bg-green-50 text-green-700"
+                    : "border border-red-200 bg-red-50 text-red-700"
+                }`}
+              >
+                {enquiryFeedback.message}
+              </div>
+            )}
+
+            <form onSubmit={handleEnquirySubmit} className="mt-6 space-y-4">
+              <div>
+                <label
+                  htmlFor="enquiry-name"
+                  className="mb-1.5 block text-sm font-semibold text-slate-700"
+                >
+                  Your name *
+                </label>
+                <input
+                  id="enquiry-name"
+                  required
+                  value={enquiry.name}
+                  onChange={(event) =>
+                    setEnquiry({ ...enquiry, name: event.target.value })
+                  }
+                  autoComplete="name"
+                  placeholder="Enter your full name"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="enquiry-email"
+                    className="mb-1.5 block text-sm font-semibold text-slate-700"
+                  >
+                    Email address *
+                  </label>
+                  <input
+                    id="enquiry-email"
+                    type="email"
+                    required
+                    value={enquiry.email}
+                    onChange={(event) =>
+                      setEnquiry({ ...enquiry, email: event.target.value })
+                    }
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="enquiry-phone"
+                    className="mb-1.5 block text-sm font-semibold text-slate-700"
+                  >
+                    Phone number
+                  </label>
+                  <input
+                    id="enquiry-phone"
+                    type="tel"
+                    value={enquiry.phone}
+                    onChange={(event) =>
+                      setEnquiry({ ...enquiry, phone: event.target.value })
+                    }
+                    autoComplete="tel"
+                    placeholder="Enter phone number"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="enquiry-message"
+                  className="mb-1.5 block text-sm font-semibold text-slate-700"
+                >
+                  Your requirement *
+                </label>
+                <textarea
+                  id="enquiry-message"
+                  required
+                  rows={4}
+                  value={enquiry.message}
+                  onChange={(event) =>
+                    setEnquiry({ ...enquiry, message: event.target.value })
+                  }
+                  placeholder={`Tell ${supplier.name} what product or service you need...`}
+                  className="w-full resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={enquiryLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {enquiryLoading ? "Sending enquiry..." : "Send Enquiry"}
+                <Send size={16} />
+              </button>
+              <p className="text-center text-xs text-slate-400">
+                Enquiry for: {supplier.name}
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
