@@ -172,7 +172,7 @@ function Footer() {
                   <p className="text-xs text-gray-500">Phone</p>
 
                   <p className="mt-1 text-sm font-medium text-gray-700">
-                    +91 00000 00000
+                    +91 6284975308
                   </p>
                 </div>
               </div>
