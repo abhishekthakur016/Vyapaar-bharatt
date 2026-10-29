@@ -10,6 +10,9 @@ import {
   SlidersHorizontal,
   X,
   IndianRupee,
+  Send,
+  Hash,
+  Boxes,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -111,6 +114,17 @@ function SupplierRequirements() {
     }
 
     return `₹${Number(value).toLocaleString("en-IN")}`;
+  };
+
+  // Display-only helper: how many days until the required-by date
+  const getDaysLeft = (date) => {
+    if (!date) return null;
+    const target = new Date(date);
+    if (Number.isNaN(target.getTime())) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    target.setHours(0, 0, 0, 0);
+    return Math.round((target - today) / 86400000);
   };
 
   if (loading) {
@@ -330,130 +344,200 @@ function SupplierRequirements() {
           </div>
         )}
 
-        {/* REQUIREMENTS */}
+        {/* =====================================================
+            REQUIREMENTS — redesigned cards
+        ===================================================== */}
         {filteredRequirements.length > 0 && (
-          <div className="grid gap-5">
+          <div className="grid gap-5 lg:grid-cols-2">
             {filteredRequirements.map((requirement) => {
               const minBudget = formatCurrency(requirement.min_budget);
-
               const maxBudget = formatCurrency(requirement.max_budget);
+              const hasBudget = Boolean(minBudget || maxBudget);
+              const budgetText = hasBudget
+                ? `${minBudget || ""}${minBudget && maxBudget ? " – " : ""}${
+                    maxBudget || ""
+                  }`
+                : "Not specified";
+
+              const daysLeft = getDaysLeft(requirement.required_by);
+              const urgent =
+                daysLeft !== null && daysLeft >= 0 && daysLeft <= 7;
+
+              const requiredByText = requirement.required_by
+                ? new Date(requirement.required_by).toLocaleDateString(
+                    "en-IN",
+                    { day: "2-digit", month: "short", year: "numeric" },
+                  )
+                : "Flexible";
 
               return (
                 <article
                   key={requirement.id}
-                  className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl sm:p-7"
+                  className="group relative flex flex-col overflow-hidden rounded-[22px] border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(9,82,212,0.12)] transition duration-300 hover:-translate-y-1 hover:border-[#0952d4]/25 hover:shadow-[0_20px_50px_-20px_rgba(9,82,212,0.35)]"
                 >
-                  <div className="flex flex-col gap-7 lg:flex-row lg:justify-between">
-                    {/* CONTENT */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-black text-[#0952d4]">
-                          {requirement.category}
-                        </span>
+                  {/* Top accent bar */}
+                  <div className="h-1 w-full bg-gradient-to-r from-[#0952d4] via-[#1684e8] to-[#fd8836] opacity-70 transition group-hover:opacity-100" />
 
-                        {requirement.subcategory && (
-                          <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600">
-                            {requirement.subcategory}
+                  <div className="flex flex-1 flex-col p-5 sm:p-6">
+                    {/* HEADER */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0952d4] to-[#1684e8] text-white shadow-[0_8px_18px_-6px_rgba(9,82,212,0.6)]">
+                        <Boxes size={22} />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="rounded-md bg-[#0952d4]/[0.08] px-2 py-1 text-[11px] font-extrabold text-[#0952d4]">
+                            {requirement.category}
                           </span>
-                        )}
 
-                        <span className="rounded-full bg-green-50 px-3 py-1.5 text-xs font-black capitalize text-green-600">
-                          ● Open
+                          {requirement.subcategory && (
+                            <span className="rounded-md bg-slate-100 px-2 py-1 text-[11px] font-bold text-slate-600">
+                              {requirement.subcategory}
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="mt-2 line-clamp-2 text-lg font-black leading-snug tracking-tight text-[#0b1f3a] transition group-hover:text-[#0952d4] sm:text-xl">
+                          {requirement.title}
+                        </h3>
+                      </div>
+
+                      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-[11px] font-extrabold text-green-700">
+                        <span className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                        </span>
+                        Open
+                      </span>
+                    </div>
+
+                    {requirement.description && (
+                      <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-500">
+                        {requirement.description}
+                      </p>
+                    )}
+
+                    {/* BUDGET HIGHLIGHT */}
+                    <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-[#fd8836]/20 bg-gradient-to-r from-[#fd8836]/[0.08] to-transparent px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#fd8836] shadow-sm">
+                          <IndianRupee size={16} />
+                        </div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                          Budget
                         </span>
                       </div>
-
-                      <h3 className="mt-4 text-xl font-black text-[#0b1f3a] sm:text-2xl">
-                        {requirement.title}
-                      </h3>
-
-                      {requirement.description && (
-                        <p className="mt-3 max-w-3xl line-clamp-2 text-sm leading-6 text-slate-500">
-                          {requirement.description}
-                        </p>
-                      )}
-
-                      {/* DETAILS */}
-                      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-xl bg-slate-50 p-4">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-                            <Package size={15} />
-                            Quantity
-                          </div>
-
-                          <p className="mt-2 text-sm font-black text-[#0b1f3a]">
-                            {requirement.quantity} {requirement.unit}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl bg-slate-50 p-4">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-                            <MapPin size={15} />
-                            Delivery
-                          </div>
-
-                          <p className="mt-2 text-sm font-black text-[#0b1f3a]">
-                            {requirement.delivery_location}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl bg-slate-50 p-4">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-                            <IndianRupee size={15} />
-                            Budget
-                          </div>
-
-                          <p className="mt-2 text-sm font-black text-[#0b1f3a]">
-                            {minBudget || maxBudget
-                              ? `${minBudget || ""}${
-                                  minBudget && maxBudget ? " – " : ""
-                                }${maxBudget || ""}`
-                              : "Not specified"}
-                          </p>
-                        </div>
-
-                        <div className="rounded-xl bg-slate-50 p-4">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-                            <CalendarDays size={15} />
-                            Required By
-                          </div>
-
-                          <p className="mt-2 text-sm font-black text-[#0b1f3a]">
-                            {requirement.required_by
-                              ? new Date(
-                                  requirement.required_by,
-                                ).toLocaleDateString("en-IN", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                })
-                              : "Flexible"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* REQUIREMENT ID */}
-                      <p className="mt-5 text-xs font-medium text-slate-400">
-                        Requirement ID: #
-                        {String(requirement.id).padStart(5, "0")}
+                      <p
+                        className={`text-right text-base font-black tracking-tight sm:text-lg ${
+                          hasBudget
+                            ? "text-[#0b1f3a]"
+                            : "text-sm text-slate-400"
+                        }`}
+                      >
+                        {budgetText}
                       </p>
                     </div>
 
-                    {/* ACTION */}
-                    <div className="flex shrink-0 flex-col justify-center gap-3 border-t border-slate-100 pt-5 lg:w-52 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
-                      <Link
-                        to={`/requirements/${requirement.id}`}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#fd8836] px-5 py-3.5 text-sm font-black text-white transition hover:bg-[#f77925]"
-                      >
-                        View Requirement
-                        <ArrowRight size={17} />
-                      </Link>
+                    {/* DETAILS */}
+                    <dl className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                      <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 sm:flex-col sm:items-start sm:gap-1.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#0952d4] shadow-sm sm:h-7 sm:w-7">
+                          <Package size={15} />
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Quantity
+                          </dt>
+                          <dd className="truncate text-sm font-extrabold text-[#0b1f3a]">
+                            {requirement.quantity} {requirement.unit}
+                          </dd>
+                        </div>
+                      </div>
 
-                      <Link
-                        to={`/requirements/${requirement.id}`}
-                        className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-5 py-3.5 text-sm font-bold text-[#0b1f3a] transition hover:border-[#0952d4] hover:text-[#0952d4]"
-                      >
-                        Send Quote
-                      </Link>
+                      <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 sm:flex-col sm:items-start sm:gap-1.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#0952d4] shadow-sm sm:h-7 sm:w-7">
+                          <MapPin size={15} />
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Delivery
+                          </dt>
+                          <dd
+                            className="truncate text-sm font-extrabold text-[#0b1f3a]"
+                            title={requirement.delivery_location}
+                          >
+                            {requirement.delivery_location}
+                          </dd>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 sm:flex-col sm:items-start sm:gap-1.5">
+                        <div
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm sm:h-7 sm:w-7 ${
+                            urgent
+                              ? "bg-[#fd8836] text-white"
+                              : "bg-white text-[#0952d4]"
+                          }`}
+                        >
+                          <CalendarDays size={15} />
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Required By
+                          </dt>
+                          <dd className="truncate text-sm font-extrabold text-[#0b1f3a]">
+                            {requiredByText}
+                          </dd>
+                        </div>
+                      </div>
+                    </dl>
+
+                    {/* FOOTER */}
+                    <div className="mt-auto pt-5">
+                      <div className="flex flex-col gap-3 border-t border-dashed border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] font-semibold text-slate-500">
+                            <Hash size={11} />
+                            {String(requirement.id).padStart(5, "0")}
+                          </span>
+
+                          {daysLeft !== null && daysLeft >= 0 && (
+                            <span
+                              className={`rounded-md px-2 py-1 text-[11px] font-bold ${
+                                urgent
+                                  ? "bg-[#fd8836]/10 text-[#e0661a]"
+                                  : "bg-[#0952d4]/[0.06] text-[#0952d4]"
+                              }`}
+                            >
+                              {daysLeft === 0
+                                ? "Due today"
+                                : `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 sm:flex">
+                          <Link
+                            to={`/requirements/${requirement.id}`}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-[#0b1f3a] transition hover:border-[#0952d4] hover:bg-[#0952d4]/[0.04] hover:text-[#0952d4]"
+                          >
+                            <Send size={15} />
+                            Send Quote
+                          </Link>
+
+                          <Link
+                            to={`/requirements/${requirement.id}`}
+                            className="group/btn inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#fd8836] px-4 py-2.5 text-sm font-black text-white shadow-[0_8px_18px_-8px_rgba(253,136,54,0.8)] transition hover:bg-[#f77925]"
+                          >
+                            View Details
+                            <ArrowRight
+                              size={16}
+                              className="transition group-hover/btn:translate-x-0.5"
+                            />
+                          </Link>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </article>

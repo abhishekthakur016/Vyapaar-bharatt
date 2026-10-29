@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
+  ArrowUpRight,
   BarChart3,
   BookOpen,
   Factory,
   Globe2,
+  LayoutGrid,
   Lightbulb,
   Search,
+  Settings2,
+  Sparkles,
   TrendingUp,
   X,
 } from "lucide-react";
@@ -22,6 +26,58 @@ const categoryIcons = {
   globe: Globe2,
   factory: Factory,
 };
+
+/* =========================================================
+   SMALL PRESENTATIONAL PIECES
+========================================================= */
+
+// Image with a smooth zoom on hover and a branded fallback when no image exists
+function InsightImage({ src, alt, className = "" }) {
+  return (
+    <div className={`relative overflow-hidden bg-[#0b1f3a] ${className}`}>
+      {src ? (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0952d4] via-[#1684e8] to-[#0b1f3a]">
+          <Lightbulb size={34} className="text-white/40" />
+        </div>
+      )}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071a40]/70 via-[#071a40]/10 to-transparent" />
+    </div>
+  );
+}
+
+function CategoryChip({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-md">
+      {children}
+    </span>
+  );
+}
+
+function SectionLabel({ eyebrow, title, children }) {
+  return (
+    <div>
+      <p className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#0952d4]">
+        <span className="h-px w-6 bg-[#0952d4]/50" />
+        {eyebrow}
+      </p>
+      <h2 className="mt-2 text-2xl font-black tracking-[-0.02em] text-[#0b1f3a] sm:text-3xl">
+        {title}
+      </h2>
+      {children}
+    </div>
+  );
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
 
 function Insights() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -91,124 +147,176 @@ function Insights() {
     setSearchParams({});
   };
 
+  const activeCategoryName =
+    selectedCategory === "all"
+      ? "All Insights"
+      : insightCategories.find((item) => item.id === selectedCategory)?.name;
+
+  const showFeatured =
+    !loading &&
+    !error &&
+    selectedCategory === "all" &&
+    !search &&
+    insights.length > 0;
+
   return (
-    <main className="bg-white">
-      {/* HERO */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <div className="mb-4 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-            VYAPAAR BHARAT INSIGHTS.....
+    <main className="overflow-hidden bg-white">
+      {/* =====================================================
+          HERO
+      ===================================================== */}
+      <section className="relative isolate">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#f8fcff] via-[#eef7ff] to-[#e3f1ff]" />
+          <div
+            className="absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black_25%,transparent_70%)]"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(9,82,212,0.16) 1px, transparent 1px)",
+              backgroundSize: "22px 22px",
+            }}
+          />
+          <div className="absolute -left-40 -top-40 h-[480px] w-[480px] rounded-full bg-[#1684e8]/10 blur-3xl" />
+          <div className="absolute -right-32 top-20 h-[420px] w-[420px] rounded-full bg-[#fd8836]/10 blur-3xl" />
+        </div>
+
+        <div className="mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14 lg:px-8 lg:pb-20">
+          <div className="flex items-center justify-between gap-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#0952d4]/15 bg-white/80 px-3.5 py-1.5 shadow-sm backdrop-blur-md">
+              <Sparkles size={14} className="text-[#fd8836]" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#0b1f3a]">
+                Vyapaar Bharat Insights
+              </span>
+            </div>
+
+            <Link
+              to="/admin/insights"
+              className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200 backdrop-blur-md transition-all duration-300 hover:text-[#0952d4] hover:ring-[#0952d4]/40"
+            >
+              <Settings2 size={14} />
+              <span className="hidden sm:inline">Manage Insights</span>
+            </Link>
           </div>
 
-          <Link
-            to="/admin/insights"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#0952d4] hover:text-[#0952d4]"
-          >
-            Manage Insights
-          </Link>
+          <div className="mx-auto mt-10 max-w-3xl text-center sm:mt-12">
+            <h1 className="text-[40px] font-black leading-[1.02] tracking-[-0.035em] text-[#071a40] sm:text-6xl lg:text-[68px]">
+              Insights to help your{" "}
+              <span className="bg-gradient-to-r from-[#0952d4] to-[#1684e8] bg-clip-text text-transparent">
+                business grow
+              </span>
+            </h1>
 
-          <h1 className="max-w-2xl text-4xl font-bold leading-tight text-[#0b1f3a] sm:text-5xl">
-            Insights to Help Your
-            <span className="block text-[#0952d4]">Business Grow</span>
-          </h1>
+            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+              Market insights, industry trends, sourcing guides and trade
+              opportunities, so you can make better business decisions.
+            </p>
 
-          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
-            Explore market insights, industry trends, sourcing guides, business
-            tips, and trade opportunities to make better business decisions.
-          </p>
+            {/* SEARCH */}
+            <div className="mx-auto mt-8 max-w-xl">
+              <div className="group/search relative rounded-2xl bg-white p-1.5 shadow-[0_15px_45px_-15px_rgba(9,82,212,0.3)] ring-1 ring-slate-900/[0.06] transition-all duration-300 focus-within:shadow-[0_20px_50px_-15px_rgba(9,82,212,0.45)] focus-within:ring-[#0952d4]/30">
+                <Search
+                  size={19}
+                  className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within/search:text-[#0952d4]"
+                />
 
-          {/* SEARCH */}
-          <div className="mt-8 max-w-2xl">
-            <div className="relative">
-              <Search
-                size={19}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-              />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search articles, trends, guides..."
+                  className="w-full rounded-xl bg-transparent py-3.5 pl-11 pr-12 text-sm text-[#0b1f3a] outline-none placeholder:text-slate-400"
+                />
 
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search insights..."
-                className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-11 pr-12 text-sm outline-none transition focus:border-[#0952d4] focus:ring-2 focus:ring-blue-100"
-              />
-
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
-                >
-                  <X size={17} />
-                </button>
-              )}
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    aria-label="Clear search"
+                    className="absolute right-4 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CATEGORIES */}
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="mb-7">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
-              EXPLORE
-            </p>
-
-            <h2 className="mt-1 text-2xl font-bold text-[#0b1f3a]">
-              Business Insights
-            </h2>
-
+      {/* =====================================================
+          CATEGORIES
+      ===================================================== */}
+      <section className="relative bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <SectionLabel eyebrow="Explore" title="Browse by topic">
             <p className="mt-2 text-sm text-slate-500">
-              Explore insights designed to help businesses make smarter
+              Pick a topic to filter insights designed to help you make smarter
               decisions.
             </p>
-          </div>
+          </SectionLabel>
 
-          {/* ALL */}
-          <button
-            onClick={() => selectCategory("all")}
-            className={`mb-6 rounded-lg border px-4 py-2 text-sm font-semibold transition ${
-              selectedCategory === "all"
-                ? "border-[#0952d4] bg-[#0952d4] text-white"
-                : "border-slate-300 bg-white text-slate-700 hover:border-[#0952d4]"
-            }`}
-          >
-            All Insights
-          </button>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {insightCategories.map((category) => {
-              const Icon = categoryIcons[category.icon];
-
-              const active = selectedCategory === category.id;
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                id: "all",
+                name: "All Insights",
+                description: "Everything we publish, newest first.",
+                Icon: LayoutGrid,
+              },
+              ...insightCategories.map((c) => ({
+                ...c,
+                Icon: categoryIcons[c.icon] || Lightbulb,
+              })),
+            ].map(({ id, name, description, Icon }, i) => {
+              const active = selectedCategory === id;
 
               return (
                 <button
-                  key={category.id}
-                  onClick={() => selectCategory(category.id)}
-                  className={`group rounded-xl border bg-white p-5 text-left transition hover:-translate-y-1 hover:border-[#0952d4] hover:shadow-md ${
+                  key={id}
+                  onClick={() => selectCategory(id)}
+                  aria-pressed={active}
+                  style={{ animationDelay: `${Math.min(i, 8) * 50}ms` }}
+                  className={`ins-fade group relative overflow-hidden rounded-[22px] p-5 text-left transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 ${
                     active
-                      ? "border-[#0952d4] ring-2 ring-blue-100"
-                      : "border-slate-200"
+                      ? "bg-gradient-to-br from-[#0952d4] to-[#1684e8] text-white shadow-[0_20px_40px_-18px_rgba(9,82,212,0.7)]"
+                      : "bg-slate-50 ring-1 ring-inset ring-slate-900/[0.05] hover:bg-white hover:shadow-[0_20px_40px_-20px_rgba(9,82,212,0.35)] hover:ring-[#0952d4]/20"
                   }`}
                 >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-[#0952d4]">
-                    <Icon size={19} />
+                  <div className="flex items-start justify-between">
+                    <div
+                      className={`flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-500 ${
+                        active
+                          ? "bg-white/20 text-white"
+                          : "bg-white text-[#0952d4] shadow-sm group-hover:bg-[#0952d4] group-hover:text-white"
+                      }`}
+                    >
+                      <Icon size={20} />
+                    </div>
+
+                    <span
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500 ${
+                        active
+                          ? "bg-white/20 text-white"
+                          : "text-slate-300 group-hover:rotate-45 group-hover:text-[#0952d4]"
+                      }`}
+                    >
+                      <ArrowUpRight size={17} />
+                    </span>
                   </div>
 
-                  <h3 className="font-bold text-[#0b1f3a]">{category.name}</h3>
+                  <h3
+                    className={`mt-5 font-extrabold tracking-tight ${
+                      active ? "text-white" : "text-[#0b1f3a]"
+                    }`}
+                  >
+                    {name}
+                  </h3>
 
-                  <p className="mt-2 text-xs leading-5 text-slate-500">
-                    {category.description}
+                  <p
+                    className={`mt-1.5 line-clamp-2 text-xs leading-5 ${
+                      active ? "text-white/75" : "text-slate-500"
+                    }`}
+                  >
+                    {description}
                   </p>
-
-                  <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#0952d4]">
-                    Explore Insights
-                    <ArrowRight
-                      size={13}
-                      className="transition group-hover:translate-x-1"
-                    />
-                  </span>
                 </button>
               );
             })}
@@ -216,122 +324,127 @@ function Insights() {
         </div>
       </section>
 
-      {/* INSIGHT RESULTS */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
-                LATEST
-              </p>
-
-              <h2 className="mt-1 text-2xl font-bold text-[#0b1f3a]">
-                {selectedCategory === "all"
-                  ? "All Insights"
-                  : insightCategories.find(
-                      (item) => item.id === selectedCategory,
-                    )?.name}
-              </h2>
-
+      {/* =====================================================
+          RESULTS
+      ===================================================== */}
+      <section className="bg-slate-50/70">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <SectionLabel eyebrow="Latest" title={activeCategoryName}>
               <p className="mt-2 text-sm text-slate-500">
                 {filteredInsights.length} insight
                 {filteredInsights.length !== 1 ? "s" : ""} found
               </p>
-            </div>
+            </SectionLabel>
 
             {(search || selectedCategory !== "all") && (
               <button
                 onClick={clearFilters}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[#0952d4]"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#0952d4] shadow-sm ring-1 ring-inset ring-[#0952d4]/15 transition-all duration-300 hover:bg-[#0952d4] hover:text-white"
               >
-                <X size={15} />
+                <X size={14} />
                 Clear Filters
               </button>
             )}
           </div>
 
           {loading ? (
-            <div className="rounded-xl border border-slate-200 bg-white py-16 text-center">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#0952d4]" />
-              <p className="mt-4 text-sm font-medium text-slate-500">
-                Loading insights...
-              </p>
+            /* Skeletons */
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="overflow-hidden rounded-[24px] bg-white ring-1 ring-slate-900/[0.05]"
+                >
+                  <div className="aspect-[16/10] animate-pulse bg-slate-200/70" />
+                  <div className="space-y-3 p-6">
+                    <div className="h-4 w-3/4 animate-pulse rounded-full bg-slate-200/80" />
+                    <div className="h-3 w-full animate-pulse rounded-full bg-slate-100" />
+                    <div className="h-3 w-2/3 animate-pulse rounded-full bg-slate-100" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : error ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 py-12 text-center">
-              <h3 className="font-bold text-red-700">
+            <div className="mx-auto max-w-lg rounded-[24px] bg-white p-10 text-center shadow-sm ring-1 ring-red-100">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
+                <X size={24} className="text-red-500" />
+              </div>
+              <h3 className="mt-5 text-lg font-extrabold text-[#0b1f3a]">
                 Unable to load insights
               </h3>
 
-              <p className="mt-2 text-sm text-red-600">{error}</p>
+              <p className="mt-2 text-sm text-slate-500">{error}</p>
 
               <button
                 onClick={() => window.location.reload()}
-                className="mt-5 rounded-lg bg-[#0952d4] px-5 py-2.5 text-sm font-semibold text-white"
+                className="mt-6 rounded-full bg-[#0952d4] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0744b5]"
               >
                 Try Again
               </button>
             </div>
           ) : filteredInsights.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 py-16 text-center">
-              <Search size={35} className="mx-auto text-slate-300" />
+            <div className="mx-auto max-w-lg rounded-[24px] bg-white p-12 text-center shadow-sm ring-1 ring-slate-900/[0.05]">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0952d4]/[0.07]">
+                <Search size={26} className="text-[#0952d4]" />
+              </div>
 
-              <h3 className="mt-4 font-bold text-[#0b1f3a]">
+              <h3 className="mt-5 text-lg font-extrabold text-[#0b1f3a]">
                 No insights found
               </h3>
 
               <p className="mt-2 text-sm text-slate-500">
-                Try another search term or category.
+                Try another search term or topic.
               </p>
 
               <button
                 onClick={clearFilters}
-                className="mt-5 rounded-lg bg-[#0952d4] px-5 py-2.5 text-sm font-semibold text-white"
+                className="mt-6 rounded-full bg-[#0952d4] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0744b5]"
               >
                 View All Insights
               </button>
             </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {filteredInsights.map((insight) => (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredInsights.map((insight, i) => (
                 <article
                   key={insight.id}
-                  className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg"
+                  style={{ animationDelay: `${Math.min(i, 8) * 70}ms` }}
+                  className="ins-fade group relative flex flex-col overflow-hidden rounded-[24px] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04),0_10px_30px_-15px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.05] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-25px_rgba(9,82,212,0.35)] hover:ring-[#0952d4]/20"
                 >
-                  <div
-                    className="relative flex h-36 items-end bg-slate-200 bg-cover bg-center p-5"
-                    style={{
-                      backgroundImage: insight.image_url
-                        ? `url(${insight.image_url})`
-                        : undefined,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/30" />
-
-                    <span className="relative z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-                      {insight.category}
-                    </span>
+                  <div className="relative">
+                    <InsightImage
+                      src={insight.image_url}
+                      alt={insight.title}
+                      className="aspect-[16/10]"
+                    />
+                    <div className="absolute left-4 top-4">
+                      <CategoryChip>{insight.category}</CategoryChip>
+                    </div>
                   </div>
 
-                  <div className="p-5">
-                    <h3 className="text-base font-bold leading-6 text-[#0b1f3a]">
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="line-clamp-2 text-lg font-extrabold leading-snug tracking-[-0.01em] text-[#0b1f3a] transition-colors duration-300 group-hover:text-[#0952d4]">
                       {insight.title}
                     </h3>
 
-                    <p className="mt-3 text-sm leading-6 text-slate-500">
+                    <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-slate-500">
                       {insight.excerpt}
                     </p>
 
-                    <Link
-                      to={`/insights/${insight.id}`}
-                      className="mt-5 inline-flex items-center gap-1 text-xs font-bold text-[#0952d4]"
-                    >
-                      Read More
-                      <ArrowRight
-                        size={14}
-                        className="transition group-hover:translate-x-1"
-                      />
-                    </Link>
+                    <div className="mt-auto flex items-center justify-between pt-6">
+                      {/* Whole card is clickable via this link's overlay */}
+                      <Link
+                        to={`/insights/${insight.id}`}
+                        className="text-sm font-semibold text-[#0b1f3a] after:absolute after:inset-0 after:content-[''] group-hover:text-[#0952d4]"
+                      >
+                        Read article
+                      </Link>
+
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-[#0b1f3a] transition-all duration-500 group-hover:rotate-45 group-hover:bg-[#fd8836] group-hover:text-white">
+                        <ArrowUpRight size={17} />
+                      </span>
+                    </div>
                   </div>
                 </article>
               ))}
@@ -340,100 +453,137 @@ function Insights() {
         </div>
       </section>
 
-      {/* FEATURED */}
-      {!loading &&
-        !error &&
-        selectedCategory === "all" &&
-        !search &&
-        insights.length > 0 && (
-          <section className="border-b border-slate-200 bg-slate-50">
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-              <div className="mb-7 flex items-end justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#0952d4]">
-                    FEATURED
-                  </p>
+      {/* =====================================================
+          FEATURED — bento layout
+      ===================================================== */}
+      {showFeatured && (
+        <section className="bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <SectionLabel eyebrow="Featured" title="Editor's picks" />
 
-                  <h2 className="mt-1 text-2xl font-bold text-[#0b1f3a]">
-                    Featured Insights
-                  </h2>
-                </div>
+              <button
+                onClick={() => selectCategory("all")}
+                className="group hidden items-center gap-1.5 text-sm font-semibold text-[#0952d4] sm:inline-flex"
+              >
+                View all insights
+                <ArrowRight
+                  size={15}
+                  className="transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </button>
+            </div>
 
-                <button
-                  onClick={() => selectCategory("all")}
-                  className="hidden text-xs font-semibold text-[#0952d4] sm:block"
-                >
-                  View all insights →
-                </button>
-              </div>
+            <div className="grid gap-6 lg:grid-cols-2 lg:grid-rows-2">
+              {featuredInsights.map((insight, i) => {
+                const big = i === 0;
 
-              <div className="grid gap-5 md:grid-cols-3">
-                {featuredInsights.map((insight) => (
+                return (
                   <Link
                     key={insight.id}
                     to={`/insights/${insight.id}`}
-                    className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg"
+                    style={{ animationDelay: `${i * 90}ms` }}
+                    className={`ins-fade group relative block overflow-hidden rounded-[28px] ring-1 ring-slate-900/[0.05] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_30px_60px_-25px_rgba(9,82,212,0.45)] ${
+                      big ? "lg:row-span-2" : ""
+                    }`}
                   >
-                    <div
-                      className="relative flex h-36 items-end bg-slate-200 bg-cover bg-center p-5"
-                      style={{
-                        backgroundImage: insight.image_url
-                          ? `url(${insight.image_url})`
-                          : undefined,
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-black/30" />
+                    <InsightImage
+                      src={insight.image_url}
+                      alt={insight.title}
+                      className={
+                        big
+                          ? "aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[460px]"
+                          : "aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[218px]"
+                      }
+                    />
 
-                      <span className="relative z-10 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-                        {insight.category}
-                      </span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#071a40]/90 via-[#071a40]/30 to-transparent" />
 
-                    <div className="p-5">
-                      <h3 className="text-sm font-bold leading-6 text-[#0b1f3a]">
-                        {insight.title}
-                      </h3>
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
+                      <div className="min-w-0">
+                        <CategoryChip>{insight.category}</CategoryChip>
+                        <h3
+                          className={`mt-3 line-clamp-2 font-extrabold leading-snug tracking-[-0.02em] text-white ${
+                            big ? "text-xl sm:text-3xl" : "text-lg sm:text-xl"
+                          }`}
+                        >
+                          {insight.title}
+                        </h3>
+                        {big && insight.excerpt && (
+                          <p className="mt-2 hidden max-w-lg line-clamp-2 text-sm leading-relaxed text-white/75 sm:block">
+                            {insight.excerpt}
+                          </p>
+                        )}
+                      </div>
 
-                      <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#0952d4]">
-                        Read More
-                        <ArrowRight
-                          size={14}
-                          className="transition group-hover:translate-x-1"
-                        />
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all duration-500 group-hover:rotate-45 group-hover:bg-[#fd8836]">
+                        <ArrowUpRight size={19} />
                       </span>
                     </div>
                   </Link>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-      {/* CTA */}
-      <section className="bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl rounded-xl bg-[#0b1f3a] px-6 py-10 text-center sm:px-10">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white">
-            <Globe2 size={19} />
+      {/* =====================================================
+          CTA
+      ===================================================== */}
+      <section className="bg-white px-4 pb-16 pt-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-[#0b1f3a] px-6 py-14 text-center sm:px-12">
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute -left-20 -top-24 h-72 w-72 rounded-full bg-[#0952d4]/40 blur-3xl" />
+            <div className="absolute -bottom-28 -right-16 h-72 w-72 rounded-full bg-[#fd8836]/30 blur-3xl" />
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
+                backgroundSize: "20px 20px",
+              }}
+            />
           </div>
 
-          <h2 className="mt-4 text-xl font-bold text-white">
-            Looking for the right supplier?
-          </h2>
+          <div className="relative">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-inset ring-white/15 backdrop-blur-md">
+              <Globe2 size={22} />
+            </div>
 
-          <p className="mx-auto mt-2 max-w-lg text-xs leading-5 text-slate-300">
-            Find verified businesses, explore products, and connect with
-            suppliers that match your sourcing requirements.
-          </p>
+            <h2 className="mt-5 text-2xl font-black tracking-[-0.02em] text-white sm:text-4xl">
+              Looking for the right supplier?
+            </h2>
 
-          <Link
-            to="/post-requirement"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#fd8836] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-orange-600"
-          >
-            Post a Requirement
-            <ArrowRight size={14} />
-          </Link>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-300">
+              Find verified businesses, explore products, and connect with
+              suppliers that match your sourcing requirements.
+            </p>
+
+            <Link
+              to="/post-requirement"
+              className="group mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-[#fd8836] pl-6 pr-1.5 text-sm font-bold text-white shadow-[0_15px_30px_-12px_rgba(253,136,54,0.8)] transition-all duration-300 hover:bg-[#f77925]"
+            >
+              Post a Requirement
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-0.5">
+                <ArrowRight size={16} />
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
+
+      <style>{`
+        @keyframes insFadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .ins-fade { animation: insFadeUp 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+        @media (prefers-reduced-motion: reduce) {
+          .ins-fade { animation: none; }
+          .ins-fade, .ins-fade * { transition: none !important; }
+        }
+      `}</style>
     </main>
   );
 }

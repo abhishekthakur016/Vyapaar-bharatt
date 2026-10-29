@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
+  ArrowUpRight,
   FileText,
-  IndianRupee,
   LoaderCircle,
   MapPin,
   RefreshCw,
@@ -12,6 +12,13 @@ import {
   CheckCircle2,
   XCircle,
   MessageCircle,
+  Package,
+  Truck,
+  CalendarDays,
+  SlidersHorizontal,
+  ChevronDown,
+  X,
+  Quote,
 } from "lucide-react";
 
 const API = "";
@@ -114,361 +121,531 @@ export default function MyQuotes() {
     return Number(price).toLocaleString("en-IN");
   };
 
+  // Brand-matched status styles
   const getStatusStyle = (status) => {
     switch (status) {
       case "accepted":
         return {
-          bg: "bg-green-50",
-          text: "text-green-700",
-          border: "border-green-200",
+          pill: "bg-emerald-50 text-emerald-700 ring-emerald-200/70",
+          dot: "bg-emerald-500",
           icon: CheckCircle2,
         };
 
       case "rejected":
         return {
-          bg: "bg-red-50",
-          text: "text-red-700",
-          border: "border-red-200",
+          pill: "bg-red-50 text-red-600 ring-red-200/70",
+          dot: "bg-red-500",
           icon: XCircle,
         };
 
       case "negotiating":
         return {
-          bg: "bg-orange-50",
-          text: "text-orange-700",
-          border: "border-orange-200",
+          pill: "bg-[#fd8836]/10 text-[#e0661a] ring-[#fd8836]/30",
+          dot: "bg-[#fd8836]",
           icon: MessageCircle,
         };
 
       default:
         return {
-          bg: "bg-blue-50",
-          text: "text-blue-700",
-          border: "border-blue-200",
+          pill: "bg-[#0952d4]/[0.07] text-[#0952d4] ring-[#0952d4]/20",
+          dot: "bg-[#0952d4]",
           icon: Clock3,
         };
     }
   };
 
+  const hasFilters = search || statusFilter !== "all";
+
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("all");
+  };
+
+  /* =========================================================
+     LOGIN REQUIRED
+  ========================================================= */
+
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-50 px-5 py-16">
-        <div className="mx-auto max-w-xl rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
-            <FileText className="h-8 w-8 text-blue-600" />
+      <main className="min-h-screen bg-slate-50">
+        <div className="mx-auto flex min-h-[70vh] max-w-xl items-center justify-center px-4">
+          <div className="mq-fade w-full rounded-[28px] bg-white p-10 text-center shadow-[0_20px_50px_-25px_rgba(9,82,212,0.35)] ring-1 ring-slate-900/[0.05]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0952d4] to-[#1684e8] text-white shadow-[0_10px_25px_-10px_rgba(9,82,212,0.7)]">
+              <FileText size={28} />
+            </div>
+
+            <h1 className="mt-6 text-2xl font-black tracking-tight text-[#0b1f3a]">
+              Login Required
+            </h1>
+
+            <p className="mt-3 text-sm leading-6 text-slate-500">
+              Please login as a supplier to view your submitted quotes.
+            </p>
+
+            <Link
+              to="/login"
+              className="mt-7 inline-flex rounded-xl bg-[#0952d4] px-7 py-3 text-sm font-bold text-white transition hover:bg-[#0744b5]"
+            >
+              Login
+            </Link>
           </div>
-
-          <h1 className="text-2xl font-bold text-[#0b1f3a]">Login Required</h1>
-
-          <p className="mt-3 text-slate-500">
-            Please login as a supplier to view your submitted quotes.
-          </p>
-
-          <Link
-            to="/login"
-            className="mt-7 inline-flex rounded-xl bg-[#0952d4] px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-          >
-            Login
-          </Link>
         </div>
-      </div>
+        <AnimStyles />
+      </main>
     );
   }
 
+  /* =========================================================
+     PAGE
+  ========================================================= */
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
-          <Link
-            to="/"
-            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-[#0952d4]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
+    <main className="min-h-screen bg-slate-50">
+      {/* HERO — same style as Supplier Requirements */}
+      <section className="relative overflow-hidden bg-[#1b5fd7]">
+        <div className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[#0952d4]/30 blur-3xl" />
+        <div className="absolute -bottom-40 left-1/3 h-80 w-80 rounded-full bg-[#fd8836]/20 blur-3xl" />
 
-          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-[#0952d4]">
-                Supplier Dashboard
-              </p>
-
-              <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0b1f3a] sm:text-4xl">
-                My Quotes
-              </h1>
-
-              <p className="mt-2 max-w-2xl text-slate-500">
-                Track the quotations you have submitted to buyer requirements.
-              </p>
-
-              {user?.name && (
-                <p className="mt-2 text-sm text-slate-400">
-                  Logged in as{" "}
-                  <span className="font-semibold text-slate-600">
-                    {user.name}
-                  </span>
-                </p>
-              )}
-            </div>
+        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <div className="flex items-center justify-between gap-4">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition hover:text-white"
+            >
+              <ArrowLeft size={16} />
+              Back to Home
+            </Link>
 
             <button
               type="button"
               onClick={() => fetchMyQuotes(true)}
               disabled={refreshing}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-[#0952d4] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white hover:text-[#0952d4] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw
-                className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+                size={15}
+                className={refreshing ? "animate-spin" : ""}
               />
-              Refresh
+              <span className="hidden sm:inline">
+                {refreshing ? "Refreshing..." : "Refresh"}
+              </span>
             </button>
+          </div>
+
+          <div className="mt-8 max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-white">
+              <FileText size={15} />
+              Supplier Dashboard
+            </div>
+
+            <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              My Quotes.
+              <span className="block text-[#fd8836]">Track Every Deal.</span>
+            </h1>
+
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
+              Track the quotations you have submitted to buyer requirements.
+            </p>
+
+            {user?.name && (
+              <p className="mt-3 text-sm text-white/60">
+                Logged in as{" "}
+                <span className="font-bold text-white">{user.name}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Stats */}
+          <div className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+            <StatCard
+              label="Total Quotes"
+              value={stats.total}
+              icon={FileText}
+              className="col-span-2 sm:col-span-1"
+            />
+            <StatCard label="Pending" value={stats.pending} icon={Clock3} />
+            <StatCard
+              label="Negotiating"
+              value={stats.negotiating}
+              icon={MessageCircle}
+              accent
+            />
+            <StatCard
+              label="Accepted"
+              value={stats.accepted}
+              icon={CheckCircle2}
+            />
+            <StatCard label="Rejected" value={stats.rejected} icon={XCircle} />
           </div>
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          <StatCard label="Total Quotes" value={stats.total} icon={FileText} />
-
-          <StatCard label="Pending" value={stats.pending} icon={Clock3} />
-
-          <StatCard
-            label="Negotiating"
-            value={stats.negotiating}
-            icon={MessageCircle}
-          />
-
-          <StatCard
-            label="Accepted"
-            value={stats.accepted}
-            icon={CheckCircle2}
-          />
-
-          <StatCard label="Rejected" value={stats.rejected} icon={XCircle} />
-        </div>
-
-        {/* Filters */}
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      {/* MAIN */}
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        {/* SEARCH / FILTER */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="grid gap-3 lg:grid-cols-[1fr_220px_auto]">
+            <div className="relative">
+              <Search
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
 
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search requirement, category..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm outline-none transition focus:border-[#0952d4] focus:bg-white focus:ring-4 focus:ring-[#0952d4]/10"
               />
             </div>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:border-blue-400"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="negotiating">Negotiating</option>
-              <option value="accepted">Accepted</option>
-              <option value="rejected">Rejected</option>
-            </select>
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 pr-10 text-sm font-medium text-[#0b1f3a] outline-none focus:border-[#0952d4] focus:ring-4 focus:ring-[#0952d4]/10"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="negotiating">Negotiating</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <ChevronDown
+                size={16}
+                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+            </div>
+
+            {hasFilters ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200"
+              >
+                <X size={17} />
+                Clear
+              </button>
+            ) : (
+              <div className="hidden items-center justify-center gap-2 rounded-xl bg-blue-50 px-5 py-3 text-sm font-bold text-[#0952d4] lg:flex">
+                <SlidersHorizontal size={17} />
+                Filters
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Error */}
+        {/* RESULTS HEADER */}
+        <div className="mb-6 mt-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-[#0952d4]">
+              Quotation History
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black text-[#0b1f3a] sm:text-3xl">
+              Submitted Quotes
+            </h2>
+
+            <p className="mt-2 text-sm text-slate-500">
+              {filteredQuotes.length} quote
+              {filteredQuotes.length !== 1 ? "s" : ""} matching your search
+            </p>
+          </div>
+
+          <Link
+            to="/supplier/requirements"
+            className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-500 shadow-sm transition hover:text-[#0952d4]"
+          >
+            <Package size={15} />
+            Find More Requirements
+          </Link>
+        </div>
+
+        {/* ERROR */}
         {error && (
-          <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-white p-4 text-sm font-medium text-red-600 shadow-sm">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50">
+              <X size={16} />
+            </div>
             {error}
           </div>
         )}
 
-        {/* Loading */}
+        {/* LOADING */}
         {loading ? (
           <div className="flex min-h-[350px] items-center justify-center">
-            <div className="flex flex-col items-center gap-3 text-slate-500">
-              <LoaderCircle className="h-8 w-8 animate-spin text-[#0952d4]" />
-              <p>Loading your quotes...</p>
+            <div className="text-center">
+              <LoaderCircle
+                size={42}
+                className="mx-auto animate-spin text-[#0952d4]"
+              />
+              <p className="mt-4 text-sm font-bold text-slate-600">
+                Loading your quotes...
+              </p>
             </div>
           </div>
         ) : filteredQuotes.length === 0 ? (
-          /* Empty */
-          <div className="mt-8 rounded-3xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
-              <FileText className="h-8 w-8 text-slate-400" />
+          /* EMPTY */
+          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-50">
+              <FileText size={34} className="text-[#0952d4]" />
             </div>
 
-            <h2 className="text-xl font-bold text-[#0b1f3a]">
-              No quotes found
-            </h2>
+            <h3 className="mt-6 text-2xl font-black text-[#0b1f3a]">
+              No Quotes Found
+            </h3>
 
-            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-500">
               {quotes.length === 0
                 ? "You haven't submitted any quotes yet."
                 : "No quotes match your current search or status filter."}
             </p>
 
-            {quotes.length === 0 && (
+            {quotes.length === 0 ? (
               <Link
                 to="/supplier/requirements"
-                className="mt-6 inline-flex rounded-xl bg-[#0952d4] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                className="mt-6 inline-flex rounded-xl bg-[#0952d4] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0744b5]"
               >
                 Find Buyer Requirements
               </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-6 rounded-xl bg-[#0952d4] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0744b5]"
+              >
+                Clear Filters
+              </button>
             )}
           </div>
         ) : (
-          /* Quotes */
-          <div className="mt-8 space-y-5">
-            {filteredQuotes.map((quote) => {
+          /* QUOTE CARDS */
+          <div className="grid gap-6 md:grid-cols-2 xl:gap-7">
+            {filteredQuotes.map((quote, index) => {
               const status = getStatusStyle(quote.status);
-
               const StatusIcon = status.icon;
 
               return (
-                <div
+                <article
                   key={quote.id}
-                  className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+                  className="mq-fade group relative rounded-[28px] p-px"
+                  style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
                 >
-                  <div className="p-5 sm:p-6">
-                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                      {/* Requirement */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#0952d4]">
-                            Requirement #{quote.requirement_id}
-                          </span>
+                  {/* Gradient border on hover */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-[#0952d4]/40 via-[#1684e8]/10 to-[#fd8836]/50 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 rounded-[28px] ring-1 ring-inset ring-slate-900/[0.06] transition-opacity duration-500 group-hover:opacity-0"
+                  />
 
-                          <span
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold capitalize ${status.bg} ${status.text} ${status.border}`}
-                          >
-                            <StatusIcon className="h-3.5 w-3.5" />
-                            {quote.status || "pending"}
-                          </span>
-                        </div>
+                  <div className="relative flex h-full flex-col overflow-hidden rounded-[27px] bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_10px_30px_-15px_rgba(15,23,42,0.12)] transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:shadow-[0_30px_60px_-25px_rgba(9,82,212,0.35)] sm:p-7">
+                    {/* Corner glow */}
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[#1684e8]/[0.07] blur-2xl transition-all duration-700 group-hover:-right-16 group-hover:-top-16 group-hover:bg-[#fd8836]/[0.12]"
+                    />
 
-                        <h2 className="mt-3 text-xl font-bold text-[#0b1f3a]">
-                          {quote.requirement_title || "Buyer Requirement"}
-                        </h2>
+                    {/* TOP ROW */}
+                    <div className="relative flex items-center justify-between gap-3">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0952d4]/[0.07] px-3 py-1 text-xs font-bold text-[#0952d4]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#0952d4]" />
+                        Requirement #{quote.requirement_id}
+                      </span>
 
-                        <p className="mt-1 text-sm text-slate-500">
-                          {quote.requirement_category || "General"}
-                        </p>
-                      </div>
-
-                      {/* Price */}
-                      <div className="rounded-2xl bg-slate-50 px-5 py-4 lg:min-w-[190px]">
-                        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                          Your Quote
-                        </p>
-
-                        <div className="mt-1 flex items-center gap-1 text-xl font-bold text-[#0b1f3a]">
-                          <IndianRupee className="h-5 w-5" />
-                          {formatPrice(quote.quoted_price)}
-                        </div>
-
-                        <p className="mt-1 text-xs text-slate-400">
-                          {quote.unit || "Unit"}
-                        </p>
-                      </div>
+                      <span
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ring-inset ${status.pill}`}
+                      >
+                        <StatusIcon size={13} />
+                        {quote.status || "pending"}
+                      </span>
                     </div>
 
-                    {/* Details */}
-                    <div className="mt-6 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {/* TITLE */}
+                    <Link
+                      to={`/requirements/${quote.requirement_id}`}
+                      className="relative mt-5 block"
+                    >
+                      <h3 className="line-clamp-2 text-xl font-extrabold leading-snug tracking-[-0.02em] text-[#0b1f3a] transition-colors duration-300 group-hover:text-[#0952d4] sm:text-[22px]">
+                        {quote.requirement_title || "Buyer Requirement"}
+                      </h3>
+                    </Link>
+
+                    <p className="relative mt-1.5 text-sm font-medium text-slate-400">
+                      {quote.requirement_category || "General"}
+                    </p>
+
+                    {/* YOUR QUOTE */}
+                    <div className="relative mt-6 flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                          Your Quote
+                        </p>
+                        <p className="mt-1 text-2xl font-black tracking-[-0.03em] text-[#0b1f3a] sm:text-[28px]">
+                          ₹{formatPrice(quote.quoted_price)}
+                          <span className="ml-1.5 text-sm font-semibold tracking-normal text-slate-400">
+                            / {quote.unit || "Unit"}
+                          </span>
+                        </p>
+                      </div>
+
+                      <span
+                        className={`mb-2 h-2.5 w-2.5 shrink-0 rounded-full ${status.dot} shadow-[0_0_0_4px_rgba(255,255,255,1)]`}
+                        aria-hidden
+                      />
+                    </div>
+
+                    {/* META */}
+                    <dl className="relative mt-6 grid grid-cols-2 gap-y-4 rounded-2xl bg-slate-50/80 py-4 ring-1 ring-inset ring-slate-900/[0.03] sm:grid-cols-4 sm:divide-x sm:divide-slate-200/70">
                       <InfoItem
-                        label="Quantity"
+                        label="Qty"
+                        icon={Package}
                         value={`${quote.quantity || "—"} ${quote.unit || ""}`}
                       />
-
                       <InfoItem
-                        label="Delivery Time"
+                        label="Delivery"
+                        icon={Truck}
                         value={quote.delivery_time || "Not specified"}
                       />
-
                       <InfoItem
-                        label="Delivery Location"
+                        label="Location"
+                        icon={MapPin}
                         value={
                           quote.requirement_delivery_location || "Not specified"
                         }
-                        icon={MapPin}
                       />
-
                       <InfoItem
                         label="Submitted"
+                        icon={CalendarDays}
                         value={formatDate(quote.created_at)}
                       />
-                    </div>
+                    </dl>
 
-                    {/* Message */}
+                    {/* MESSAGE */}
                     {quote.message && (
-                      <div className="mt-5 rounded-2xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                          Your Message
-                        </p>
-
-                        <p className="mt-2 text-sm leading-6 text-slate-600">
-                          {quote.message}
-                        </p>
+                      <div className="relative mt-4 flex gap-3 rounded-2xl border border-dashed border-slate-200 p-4">
+                        <Quote
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#fd8836]"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                            Your Message
+                          </p>
+                          <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                            {quote.message}
+                          </p>
+                        </div>
                       </div>
                     )}
 
-                    {/* Footer */}
-                    <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-xs text-slate-400">
-                        Last updated:{" "}
+                    {/* FOOTER */}
+                    <div className="relative mt-auto flex items-center justify-between gap-3 pt-6">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                        <Clock3 size={12} />
+                        Updated{" "}
                         {formatDate(quote.updated_at || quote.created_at)}
-                      </p>
+                      </span>
 
                       <Link
                         to={`/requirements/${quote.requirement_id}`}
-                        className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-[#0952d4]"
+                        className="group/btn inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-[#0b1f3a] pl-5 pr-1.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#fd8836] hover:shadow-[0_12px_24px_-10px_rgba(253,136,54,0.9)]"
                       >
-                        View Requirement
+                        <span className="hidden sm:inline">
+                          View Requirement
+                        </span>
+                        <span className="sm:hidden">View</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover/btn:rotate-45">
+                          <ArrowUpRight size={16} />
+                        </span>
                       </Link>
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
         )}
-      </main>
-    </div>
+      </section>
+
+      <AnimStyles />
+    </main>
   );
 }
 
-function StatCard({ label, value, icon: Icon }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium text-slate-400">{label}</p>
+/* =========================================================
+   STAT CARD — glass style like Supplier Requirements hero
+========================================================= */
 
-          <p className="mt-1 text-2xl font-bold text-[#0b1f3a]">{value}</p>
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  accent = false,
+  className = "",
+}) {
+  return (
+    <div
+      className={`group rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:bg-white/15 ${className}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-2xl font-black text-white">{value}</p>
+          <p className="mt-1 text-xs font-medium text-white/60">{label}</p>
         </div>
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-          <Icon className="h-5 w-5 text-[#0952d4]" />
+        <div
+          className={`flex h-9 w-9 items-center justify-center rounded-xl transition-transform duration-500 group-hover:-rotate-6 ${
+            accent ? "bg-[#fd8836] text-white" : "bg-white/15 text-white"
+          }`}
+        >
+          <Icon size={17} />
         </div>
       </div>
     </div>
   );
 }
+
+/* =========================================================
+   INFO ITEM — compact meta cell
+========================================================= */
 
 function InfoItem({ label, value, icon: Icon }) {
   return (
-    <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+    <div className="min-w-0 px-4">
+      <dt className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        {Icon && <Icon size={12} />}
         {label}
-      </p>
-
-      <div className="mt-1 flex items-start gap-1.5 text-sm font-semibold text-slate-700">
-        {Icon && <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />}
-
-        <span>{value}</span>
-      </div>
+      </dt>
+      <dd
+        className="mt-1 truncate text-sm font-bold text-[#0b1f3a]"
+        title={typeof value === "string" ? value : undefined}
+      >
+        {value}
+      </dd>
     </div>
+  );
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+function AnimStyles() {
+  return (
+    <style>{`
+      @keyframes mqFadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .mq-fade { animation: mqFadeUp 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      @media (prefers-reduced-motion: reduce) {
+        .mq-fade { animation: none; }
+        .mq-fade * { transition: none !important; }
+      }
+    `}</style>
   );
 }
