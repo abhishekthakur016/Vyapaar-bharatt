@@ -1,3 +1,4 @@
+
 name: Deploy to Bluehost
 
 on:
@@ -12,11 +13,17 @@ jobs:
     steps:
       - name: Deploy to Bluehost
         uses: appleboy/ssh-action@v1.2.0
+
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+
         with:
           host: ${{ secrets.BLUEHOST_HOST }}
           username: ${{ secrets.BLUEHOST_USER }}
           port: ${{ secrets.BLUEHOST_PORT }}
           key: ${{ secrets.BLUEHOST_SSH_KEY }}
+
+          envs: VITE_GOOGLE_CLIENT_ID
 
           script: |
             set -e
@@ -29,6 +36,9 @@ jobs:
             echo "Installing frontend dependencies..."
             cd frontend
             npm ci
+
+            echo "Configuring Google Client ID..."
+            printf 'VITE_GOOGLE_CLIENT_ID=%s\n' "$VITE_GOOGLE_CLIENT_ID" > .env.production
 
             echo "Building frontend..."
             npm run build
